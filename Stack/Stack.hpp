@@ -3,26 +3,44 @@
 template <typename T>
 class Stack {
    public:
-    Stack() {}
-    ~Stack();
-    bool Empty();
-    void Push(T& item);
-    T Pop();
-    T Top();  // поп, обратно пуш и возвращение элемента
-    std::size_t Size();
+    Stack();
+    ~Stack() noexcept;
+    bool Empty() const noexcept;
+    void Push(T& item) noexcept;
+    T Pop() noexcept;
+    T Top() const noexcept;  // поп, обратно пуш и возвращение элемента
+    std::size_t Size() const noexcept;
 
    private:
-    std::list<T> stack;
+    size_t size_;
+    size_t capacity_;
+    T* stackArr_;
+    void Resize();
 };
 
 template <typename T>
-Stack<T>::~Stack() {
-    stack.clear();
+Stack<T>::Stack() : size_(0), capacity_(2) {
+    stackArr_ = new T[capacity_];
 }
 
 template <typename T>
-bool Stack<T>::Empty() {
-    if (stack.size() == 0) {
+Stack<T>::~Stack() noexcept {
+    delete[] stackArr_;
+}
+
+template <typename T>
+void Stack<T>::Resize() {
+    size_t capacity = capacity_ * 2;
+    T* arr = new T[capacity];
+    memcpy(arr, stackArr_, capacity_ * sizeof(T));
+    capacity_ = capacity;
+    delete[] stackArr_;
+    stackArr_ = arr;
+}
+
+template <typename T>
+bool Stack<T>::Empty() const noexcept {
+    if (size_ == 0) {
         return true;
     } else {
         return false;
@@ -30,23 +48,27 @@ bool Stack<T>::Empty() {
 }
 
 template <typename T>
-std::size_t Stack<T>::Size() {
-    return stack.size();
+std::size_t Stack<T>::Size() const noexcept {
+    return size_;
 }
 
 template <typename T>
-void Stack<T>::Push(T& item) {
-    stack.push_front(item);
+void Stack<T>::Push(T& item) noexcept {
+    if (size_ == capacity_) {
+        Resize();
+    }
+    stackArr_[size_] = item;
+    size_++;
 }
 
 template <typename T>
-T Stack<T>::Pop() {
-    T temp = stack.front();
-    stack.pop_front();
+T Stack<T>::Pop() noexcept {
+    T temp = stackArr_[size_ - 1];
+    size_--;
     return temp;
 }
 
 template <typename T>
-T Stack<T>::Top() {
-    return stack.front();
+T Stack<T>::Top() const noexcept {
+    return stackArr_[size_ - 1];
 }
