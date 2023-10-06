@@ -3,7 +3,6 @@
 #include <cctype>
 
 CSVFile::~CSVFile() {
-    input.clear();
     table.clear();
 }
 
@@ -12,7 +11,7 @@ bool CSVFile::Input(std::string fileName) {
     std::string str;
     if (file.is_open()) {
         while (std::getline(file, str)) {
-            input.push_back(str);
+            StringProcessing(str);
         }
     } else {
         std::cout << "Failed to open file" << std::endl;
@@ -21,20 +20,30 @@ bool CSVFile::Input(std::string fileName) {
     return 0;
 }
 
-bool CSVFile::StringProcessing() {
+bool CSVFile::StringProcessing(std::string str) {
     std::string word = "";
-    for (const auto& str : input) {
-        for (char const& c : str) {
-            if (isalnum(c)) {
-                word += c;
-            } else {
-                if (table.find(word) == table.end()) {
-                    table[word] = 1;
-                } else {
-                    table[word]++;
-                }
-                word = "";
-            }
+    for (char const& c : str) {
+        if (isalnum(c)) {
+            word += c;
+        } else if (word != "") {
+            AddWord(word);
+            word = "";
         }
     }
+}
+
+void CSVFile::AddWord(std::string word) {
+    if (table.find(word) == table.end()) {
+        table[word] = 1;
+    } else {
+        table[word]++;
+    }
+    countWord++;
+}
+
+void CSVFile::ConvertToCSV() {
+    vector_pair sort_table = SortingTable();
+}
+
+vector_pair CSVFile::SortingTable() {
 }

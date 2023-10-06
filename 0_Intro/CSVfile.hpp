@@ -3,21 +3,24 @@
 
 #include <fstream>
 #include <iostream>
-#include <list>
 #include <map>
+#include <vector>
 
-typedef std::list<std::string> list;
 typedef std::map<std::string, std::size_t> map;
+typedef std::vector<std::pair<int, std::string>> vector_pair;
 
 class CSVFile {
    public:
-    CSVFile(){};
+    CSVFile() : countWord{0} {};
     ~CSVFile();
     bool Input(std::string fileName);
-    bool StringProcessing();
+    bool StringProcessing(std::string str);
+    void AddWord(std::string word);
+    void ConvertToCSV();
+    vector_pair SortingTable();
 
    private:
-    list input;
+    std::size_t countWord;
     map table;
 };
 
