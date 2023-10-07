@@ -21,13 +21,13 @@ bool CSVFile::Input(std::string fileName) {
 }
 
 bool CSVFile::StringProcessing(std::string str) {
-    std::string word = "";
-    for (char const& c : str) {
+    std::string word;
+    for (const auto c : str) {
         if (isalnum(c)) {
-            word += c;
-        } else if (word != "") {
+            word += c; // стандартное добавление элемента строки
+        } else if (!word.empty()) {
             AddWord(word);
-            word = "";
+            word.resize(0); 
         }
     }
 }
