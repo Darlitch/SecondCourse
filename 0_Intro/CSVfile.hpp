@@ -14,14 +14,14 @@ class CSVFile {
     CSVFile() : countWord{0} {};
     ~CSVFile();
     bool Input(std::string fileName);
-    bool StringProcessing(std::string str);
-    void AddWord(std::string word);
-    void ConvertToCSV();
-    vector_pair SortingTable();
+    void ConvertToCSV(std::string fileName);
 
    private:
     std::size_t countWord;
     map table;
+    void StringProcessing(std::string str);
+    void AddWord(std::string word);
+    vector_pair SortingTable();
 };
 
 #endif
