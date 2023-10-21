@@ -67,11 +67,16 @@ const value_type& CircularBuffer::back() const {
 // на первый элемент.
 value_type* CircularBuffer::linearize() {}
 // Проверяет, является ли буфер линеаризованным.
-bool CircularBuffer::is_linearized() const {}
+bool CircularBuffer::is_linearized() const {
+    if (first == 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
 // Сдвигает буфер так, что по нулевому индексу окажется элемент
 // с индексом new_begin.
 void CircularBuffer::rotate(std::size_t new_begin) {
-    
 }
 
 // Количество элементов, хранящихся в буфере.
