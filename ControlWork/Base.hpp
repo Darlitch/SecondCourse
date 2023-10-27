@@ -2,12 +2,11 @@
 #define BASE_HPP_
 
 #include <stdlib.h>
-#include <random>
 
 #include <iostream>
 #include <iterator>
 #include <list>
-#include <map>
+#include <random>
 
 class Base {
    public:
@@ -52,14 +51,21 @@ class A : public Base {
         condition = 'A';
     }
     void Rule1(std::list<Base*>& sequence, std::list<Base*>::iterator& it) {
-        sequence.insert(it, new T('a'));
-        sequence.insert(it, new T('b'));
-        sequence.insert(next(it, 1), new T('b'));
-        sequence.insert(next(it, 2), new T('a'));
-        // it = next(it, 2);
+        std::list<Base*> sequenceNew = {new T('a'), new T('b')};
+        sequence.insert(it, sequenceNew.begin(), sequenceNew.end());
+        sequenceNew.clear();
+        // sequence.insert(it, new T('a'));
+        // sequence.insert(it, new T('b'));
+        std::list<Base*> sequenceNew2 = {new T('b'), new T('a')};
+        sequence.insert(next(it, 1), sequenceNew2.begin(), sequenceNew2.end());
+        // sequence.insert(next(it, 1), new T('b'));
+        // sequence.insert(next(it, 2), new T('a'));
+        sequenceNew2.clear();
     }
     void Rule2(std::list<Base*>& sequence, std::list<Base*>::iterator& it) {
-        sequence.insert(next(it, 1), new T(' '));
+        std::list<Base*> sequenceNew = {new T(' ')};
+        sequence.insert(next(it, 1), sequenceNew.begin(), sequenceNew.end());
+        sequenceNew.clear();
         delete *it;
         it = sequence.erase(it);
     }
@@ -71,11 +77,14 @@ class B : public Base {
         condition = 'B';
     }
     void Rule1(std::list<Base*>& sequence, std::list<Base*>::iterator& it) {
-        sequence.insert(next(it, 1), new A);
-        // it = next(it, 1);
+        std::list<Base*> sequenceNew = {new A};
+        sequence.insert(next(it, 1), sequenceNew.begin(), sequenceNew.end());
+        sequenceNew.clear();
     }
     void Rule2(std::list<Base*>& sequence, std::list<Base*>::iterator& it) {
-        sequence.insert(next(it, 1), new T('.'));
+        std::list<Base*> sequenceNew = {new T('.')};
+        sequence.insert(next(it, 1), sequenceNew.begin(), sequenceNew.end());
+        sequenceNew.clear();
         delete *it;
         it = sequence.erase(it);
     }
