@@ -2,7 +2,7 @@
 #define BASE_HPP_
 
 #include <stdlib.h>
-#include <time.h>
+#include <random>
 
 #include <iostream>
 #include <iterator>
@@ -15,9 +15,9 @@ class Base {
         return condition;
     }
     virtual void change(std::list<Base*>& sequence, std::list<Base*>::iterator& it) {
-        srand(time(NULL));
+        std::random_device system_rand;
+        srand(system_rand());
         int rand = 1 + std::rand() % 2;
-        // int rand = 1;п
         switch (rand) {
         case 1:
             Rule1(sequence, it);
