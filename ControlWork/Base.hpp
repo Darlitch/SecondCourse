@@ -59,9 +59,10 @@ class N : public Base {
         RulesInit();
         int rand = 0 + std::rand() % rules.size();
         sequence.insert(it, rules.at(rand).begin(), rules.at(rand).end());
-        rules[rand].clear();
-        delete *it;
-        it = next(sequence.erase(it), rules.at(rand).size() - 1);
+        // delete (*it);
+        it = sequence.erase(it);
+        it = next(it, rules.at(rand).size() - 1);
+        rules.at(rand).clear();
     }
 
    protected:
@@ -73,6 +74,7 @@ class A : public N {
     A() {
         condition = 'A';
     }
+    virtual ~A() {};
     void RulesInit() {
         // std::list<Base*> rule1 = {new T('a'), new T('b'), new A, new T('b'), new T('a')};
         // rules.push_back(rule1);
@@ -86,6 +88,7 @@ class B : public N {
     B() {
         condition = 'B';
     }
+    virtual ~B() {}
     void RulesInit() {
         rules.push_back({new B, new A});
         rules.push_back({new T('.')});
