@@ -18,11 +18,11 @@ CircularBuffer::CircularBuffer(const CircularBuffer& cb) {
     std::copy_n(cb.buffer, sizeBuff, buffer);
 }
 
-explicit CircularBuffer::CircularBuffer(std::size_t capacity) : sizeBuff{0}, capacityBuff{capacity}, first{0}, end{0} {
+explicit CircularBuffer::CircularBuffer(std::size_t capacity) : sizeBuff{0}, capacityBuff{capacity} {
     buffer = new value_type[capacityBuff];
 }
 
-CircularBuffer::CircularBuffer(std::size_t capacity, const value_type& elem) : sizeBuff{capacity}, capacityBuff{capacity}, first{0}, end{capacity} {
+CircularBuffer::CircularBuffer(std::size_t capacity, const value_type& elem) : sizeBuff{capacity}, capacityBuff{capacity}, end{capacity - 1} {
     buffer = new value_type[capacityBuff];
     std::fill(buffer, buffer + capacityBuff - 1, elem);
 }
@@ -65,7 +65,11 @@ const value_type& CircularBuffer::back() const {
 // Линеаризация - сдвинуть кольцевой буфер так, что его первый элемент
 // переместится в начало аллоцированной памяти. Возвращает указатель
 // на первый элемент.
-value_type* CircularBuffer::linearize() {}
+value_type* CircularBuffer::linearize() {
+    std::rotate(buffer, buffer + first, buffer + capacityBuff - 1);
+    first = 0;
+    end = capacityBuff - 1;
+}
 // Проверяет, является ли буфер линеаризованным.
 bool CircularBuffer::is_linearized() const {
     if (first == 0) {
@@ -77,6 +81,7 @@ bool CircularBuffer::is_linearized() const {
 // Сдвигает буфер так, что по нулевому индексу окажется элемент
 // с индексом new_begin.
 void CircularBuffer::rotate(std::size_t new_begin) {
+    std::rotate(buffer, buffer + new_begin - 1, buffer + capacityBuff - 1);
 }
 
 // Количество элементов, хранящихся в буфере.
@@ -108,12 +113,40 @@ std::size_t CircularBuffer::capacity() const {
     return capacityBuff;
 }
 
-void CircularBuffer::set_capacity(std::size_t new_capacity) {}
+void CircularBuffer::set_capacity(std::size_t new_capacity) {
+    linearize();
+    value_type* newBuff = new value_type[new_capacity];
+    std::copy_n(buffer, capacityBuff, newBuff);
+    capacityBuff = new_capacity;
+    delete[] buffer;
+    buffer = newBuff;
+}
 // Изменяет размер буфера.
 // В случае расширения, новые элементы заполняются элементом item.
-void CircularBuffer::resize(std::size_t new_size, const value_type& item = value_type()) {}
+void CircularBuffer::resize(std::size_t new_size, const value_type& item = value_type()) {
+    if (new_size > capacityBuff) {
+        set_capacity(new_size);
+    } else {
+        linearize();
+    }
+    if (new_size < sizeBuff) {
+        end -= sizeBuff - new_size;
+    } else if (new_size > sizeBuff) {
+        for (std::size_t i = sizeBuff; i < new_size; ++i) {
+            buffer[i] = item;
+        }
+    }
+}
 // Оператор присваивания.
-CircularBuffer& CircularBuffer::operator=(const CircularBuffer& cb) {}
+CircularBuffer& CircularBuffer::operator=(const CircularBuffer& cb) {
+    delete[] buffer;
+    buffer = cb.buffer;
+    cb.buffer = nullptr;
+    sizeBuff = cb.sizeBuff;
+    capacityBuff = cb.capacityBuff;
+    first = cb.first;
+    end = cb.end;
+}
 // Обменивает содержимое буфера с буфером cb.
 void CircularBuffer::swap(CircularBuffer& cb) {
     std::swap(buffer, cb.buffer);
@@ -126,10 +159,22 @@ void CircularBuffer::swap(CircularBuffer& cb) {
 // Добавляет элемент в конец буфера.
 // Если текущий размер буфера равен его ёмкости, то переписывается
 // первый элемент буфера (т.е., буфер закольцован).
-void CircularBuffer::push_back(const value_type& item = value_type()) {}
+void CircularBuffer::push_back(const value_type& item = value_type()) {
+    if (sizeBuff == capacityBuff) {
+        end = first;
+        first = (first + 1) % capacityBuff;
+    } else {
+        end++;
+        sizeBuff++;
+    }
+    buffer[end] = item;
+}
 // Добавляет новый элемент перед первым элементом буфера.
 // Аналогично push_back, может переписать последний элемент буфера.
-void CircularBuffer::push_front(const value_type& item = value_type()) {}
+void CircularBuffer::push_front(const value_type& item = value_type()) {
+    if (first == 0) {
+    }
+}
 // удаляет последний элемент буфера.
 void CircularBuffer::pop_back() {}
 // удаляет первый элемент буфера.
