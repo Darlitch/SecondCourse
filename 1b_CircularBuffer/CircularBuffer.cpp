@@ -140,8 +140,8 @@ void CircularBuffer::resize(std::size_t new_size, const value_type& item = value
 // Оператор присваивания.
 CircularBuffer& CircularBuffer::operator=(const CircularBuffer& cb) {
     delete[] buffer;
-    buffer = cb.buffer;
-    cb.buffer = nullptr;
+    buffer = new value_type[cb.capacityBuff];
+    std::copy_n(cb.buffer, cb.sizeBuff, buffer);
     sizeBuff = cb.sizeBuff;
     capacityBuff = cb.capacityBuff;
     first = cb.first;
@@ -160,19 +160,29 @@ void CircularBuffer::swap(CircularBuffer& cb) {
 // Если текущий размер буфера равен его ёмкости, то переписывается
 // первый элемент буфера (т.е., буфер закольцован).
 void CircularBuffer::push_back(const value_type& item = value_type()) {
-    if (sizeBuff == capacityBuff) {
-        end = first;
-        first = (first + 1) % capacityBuff;
-    } else {
-        end++;
-        sizeBuff++;
+    if (size != 0) {
+        end = (end + 1) % capacityBuff;
+        if (end == first) {
+            first = (first + 1) % capacityBuff;
+        }
     }
     buffer[end] = item;
+    if (sizeBuff < capacityBuff) {
+        sizeBuff++;
+    }
 }
 // Добавляет новый элемент перед первым элементом буфера.
 // Аналогично push_back, может переписать последний элемент буфера.
 void CircularBuffer::push_front(const value_type& item = value_type()) {
-    if (first == 0) {
+    if (size != 0) {
+        first = (first + capacityBuff - 1) % capacityBuff;
+        if (first == end) {
+            end = (end + capacityBuff - 1) % capacityBuff;
+        }
+    }
+    buffer[first] = item;
+    if (sizeBuff < capacityBuff) {
+        sizeBuff++;
     }
 }
 // удаляет последний элемент буфера.
