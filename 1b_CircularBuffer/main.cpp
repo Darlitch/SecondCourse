@@ -48,6 +48,14 @@ TEST(Constructors, WithCapacityAndElem) {
     ASSERT_EQ(cb.capacity(), 2);
 }
 
+TEST(Operators, Staples) {
+    CircularBuffer cb(2, 'c');
+    ASSERT_EQ('c', cb[1]);
+    cb[1] = 'b';
+    ASSERT_EQ('b', cb[1]);
+    ASSERT_EQ('b', cb.back());
+}
+
 TEST(Modificators, PushBack) {
     CircularBuffer cb;
     cb.push_back('c');
@@ -61,4 +69,22 @@ TEST(Modificators, PopBack) {
     cb.push_back('c');
     cb.pop_back();
     ASSERT_EQ(cb.empty(), true);
+}
+
+TEST(Other, At) {
+    CircularBuffer cb(2, 'c');
+    ASSERT_EQ('c', cb.at(1));
+    cb.at(1) = 'b';
+    ASSERT_EQ('b', cb.at(1));
+    ASSERT_EQ('b', cb.back());
+}  // исключения дописать
+
+TEST(Other, FrontAndBack) {
+    CircularBuffer cb(2, 'c');
+    cb.front() = 'a';
+    cb.back() = 'b';
+    ASSERT_EQ('a', cb.front());
+    ASSERT_EQ('b', cb.back());
+    ASSERT_EQ('a', cb[0]);
+    ASSERT_EQ('b', cb[1]);
 }

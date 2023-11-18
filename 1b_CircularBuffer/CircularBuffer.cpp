@@ -34,7 +34,7 @@ CircularBuffer::CircularBuffer(std::size_t capacity, const value_type& elem) : s
         capacityBuff = 2;
     }
     buffer = new value_type[capacityBuff];
-    std::fill(buffer, buffer + capacityBuff - 1, elem);
+    std::fill(buffer, buffer + capacityBuff, elem);
 }
 
 // Доступ по индексу. Не проверяют правильность индекса.
