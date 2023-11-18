@@ -6,7 +6,7 @@ CC = g++
 all: build run_test
 
 build: $(FILES)
-	$(CC) $(FLAGS) $(FILES) -o buffer
+	$(CC) $(FLAGS) $(FILES) $(LIBS) -o buffer
 
 run_test:
 	./buffer

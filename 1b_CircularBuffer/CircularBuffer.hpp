@@ -80,8 +80,6 @@ class CircularBuffer {
     value_type* buffer;
     std::size_t sizeBuff;
     std::size_t capacityBuff;
-    // value_type* first = nullptr;
-    // value_type* end = nullptr;
     std::size_t first = 0;
     std::size_t end = 0;
 };
