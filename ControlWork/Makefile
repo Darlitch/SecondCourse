@@ -1,7 +1,7 @@
 CMAKE = -Wall -Weror -Wextra
 LIBS = -lgtest -lgmock -pthread
 FILES = $(wildcard *.cpp)
-CC = g++
+CC = g++ -std=c++20
 
 all: build run_test
 

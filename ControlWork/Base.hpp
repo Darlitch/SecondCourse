@@ -40,15 +40,19 @@ class N : public Base {
     }
     virtual void RulesInit() = 0;
     virtual void change(std::list<Base*>& sequence, std::list<Base*>::iterator& it) {
-        std::random_device system_rand;
-        srand(system_rand());
+        std::random_device device;
+        std::mt19937 gen(device());
+        // std::mt19937 engine;
+        std::uniform_int_distribution<> rand(0, 1);
+        // srand(system_rand());
         RulesInit();
-        int rand = 0 + std::rand() % rules.size();
-        sequence.insert(it, rules.at(rand).begin(), rules.at(rand).end());
+        // int rand = 0 + std::rand() % rules.size();
+        std::cout << "rand :" << rand(gen) << std::endl;
+        sequence.insert(it, rules.at(rand(gen)).begin(), rules.at(rand(gen)).end());
         // delete (*it);
-        it = sequence.erase(it);
-        it = next(it, rules.at(rand).size() - 1);
-        rules.at(rand).clear();
+        // it = sequence.erase(it);
+        // it = next(it, rules.at(rand(gen)).size() - 1);
+        // rules.at(rand(gen)).clear();
     }
 
    protected:
