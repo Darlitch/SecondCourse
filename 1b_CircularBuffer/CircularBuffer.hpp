@@ -4,6 +4,7 @@
 
 using value_type = char;
 
+namespace Buffer {
 class CircularBuffer {
     /*... реализация ... */
    public:
@@ -80,11 +81,12 @@ class CircularBuffer {
     value_type* buffer;
     std::size_t sizeBuff;
     std::size_t capacityBuff;
-    std::size_t first = 0;
+    std::size_t begin = 0;
     std::size_t end = 0;
 };
 
 bool operator==(const CircularBuffer& a, const CircularBuffer& b);
 bool operator!=(const CircularBuffer& a, const CircularBuffer& b);
+}  // namespace Buffer
 
 #endif
