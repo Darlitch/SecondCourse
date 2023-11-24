@@ -58,17 +58,30 @@ TEST(Operators, Staples) {
     ASSERT_EQ('b', cb.back());
 }
 
-// TEST(Operators, Assignment) {
+TEST(Operators, Assignment) {
+    CircularBuffer cb(3, 'c');
+    cb.push_back('a');
+    cb.push_back('b');
+    CircularBuffer cb2(2, 'n');
+    cb2 = cb;
+    ASSERT_EQ(cb == cb2, true);
+    CircularBuffer cb3(2, 'n');
+    cb = cb3;
+    ASSERT_EQ(cb3 == cb, true);
+}
 
-// }
-
-// TEST(Operators, Equal) {
-
-// }
-
-// TEST(Operators, NotEqual) {
-
-// }
+TEST(Operators, Equal) {
+    CircularBuffer cb(4, 'c');
+    CircularBuffer cb2(4, 'c');
+    ASSERT_EQ(cb == cb2, true);
+    ASSERT_EQ(cb != cb2, false);
+    cb.pop_back();
+    ASSERT_EQ(cb == cb2, false);
+    ASSERT_EQ(cb != cb2, true);
+    cb.push_back('a');
+    ASSERT_EQ(cb == cb2, false);
+    ASSERT_EQ(cb != cb2, true);
+}
 
 TEST(Selectors, IsLinearized) {
     CircularBuffer cb(2, 'c');
@@ -122,6 +135,18 @@ TEST(Modificators, Linearize) {
     cb2.linearize();
     ASSERT_EQ('c', cb2[0]);
     ASSERT_EQ(cb2.is_linearized(), true);
+    CircularBuffer cb3(3);
+    cb3.push_back('a');
+    cb3.push_back('b');
+    cb3.push_back('c');
+    cb3.push_back('d');
+    cb3.linearize();
+    ASSERT_EQ(cb3.at(0), 'b');
+    ASSERT_EQ(cb3.at(1), 'c');
+    ASSERT_EQ(cb3.at(2), 'd');
+    ASSERT_EQ(cb3.is_linearized(), true);
+    cb.push_back('n');
+
 }
 
 TEST(Modificators, Rotate) {
@@ -168,9 +193,19 @@ TEST(Modificators, Resize) {
     ASSERT_EQ(cb.back(), 'c');
 }
 
-// TEST(Modificators, Swap) {
-
-// }
+TEST(Modificators, Swap) {
+    CircularBuffer cb(2, 'a');
+    CircularBuffer cb2(4, 'c');
+    cb.swap(cb2);
+    ASSERT_EQ(cb.size(), 4);
+    ASSERT_EQ(cb2.size(), 2);
+    ASSERT_EQ(cb.capacity(), 4);
+    ASSERT_EQ(cb2.capacity(), 2);
+    ASSERT_EQ(cb.at(0), 'c');
+    ASSERT_EQ(cb2.at(0), 'a');
+    ASSERT_EQ(cb.at(3), 'c');
+    ASSERT_EQ(cb2.at(1), 'a');
+}
 
 TEST(Modificators, PushBack) {
     CircularBuffer cb;
@@ -178,6 +213,7 @@ TEST(Modificators, PushBack) {
     ASSERT_EQ('c', cb.back());
     cb.push_back('a');
     ASSERT_EQ('a', cb.back());
+    ASSERT_EQ(cb.size(), 2);
 }
 
 TEST(Modificators, PopBack) {
@@ -185,23 +221,54 @@ TEST(Modificators, PopBack) {
     cb.push_back('c');
     cb.pop_back();
     ASSERT_EQ(cb.empty(), true);
+    ASSERT_EQ(cb.size(), 0);
 }
 
-// TEST(Modificators, PushFront) {
+TEST(Modificators, PushFront) {
+    CircularBuffer cb;
+    cb.push_front('c');
+    ASSERT_EQ('c', cb.front());
+    cb.push_front('a');
+    ASSERT_EQ('a', cb.front());
+    ASSERT_EQ(cb.size(), 2);
+}
 
-// }
+TEST(Modificators, PopFront) {
+    CircularBuffer cb;
+    cb.push_front('c');
+    cb.pop_front();
+    ASSERT_EQ(cb.empty(), true);
+    ASSERT_EQ(cb.size(), 0);
+}
 
-// TEST(Modificators, PopFront) {
+TEST(Modificators, Insert) {
+    CircularBuffer cb(3);
+    cb.push_back('a');
+    cb.push_back('b');
+    cb.push_back('c');
+    cb.insert(1, 'n');
+    ASSERT_EQ(cb.at(0), 'a');
+    ASSERT_EQ(cb.at(1), 'n');
+    ASSERT_EQ(cb.at(2), 'b');
+    CircularBuffer cb2(3);
+    cb2.push_back('a');
+    cb2.push_back('b');
+    cb2.insert(1, 'n');
+    ASSERT_EQ(cb2.at(0), 'a');
+    ASSERT_EQ(cb2.at(1), 'n');
+    ASSERT_EQ(cb2.at(2), 'b');
+}
 
-// }
-
-// TEST(Modificators, Insert) {
-
-// }
-
-// TEST(Modificators, Erase) {
-
-// }
+TEST(Modificators, Erase) {
+    CircularBuffer cb(4);
+    cb.push_back('a');
+    cb.push_back('b');
+    cb.push_back('c');
+    cb.push_back('d');
+    cb.erase(1, 2);
+    ASSERT_EQ(cb.at(0), 'a');
+    ASSERT_EQ(cb.at(1), 'd');
+}
 
 TEST(Modificators, Clear) {
     CircularBuffer cb(2, 'c');

@@ -76,10 +76,10 @@ const value_type& Buffer::CircularBuffer::back() const {
 // переместится в начало аллоцированной памяти. Возвращает указатель
 // на первый элемент.
 value_type* Buffer::CircularBuffer::linearize() {
-    std::rotate(buffer, buffer + begin, buffer + capacityBuff - 1);
+    std::rotate(buffer, buffer + begin, buffer + capacityBuff);
     begin = 0;
     end = sizeBuff - 1;
-    return buffer;  // зачем...
+    return buffer; 
 }
 // Проверяет, является ли буфер линеаризованным.
 bool Buffer::CircularBuffer::is_linearized() const {
@@ -227,7 +227,7 @@ void Buffer::CircularBuffer::insert(std::size_t pos, const value_type& item) {
         sizeBuff++;
     }
     buffer[end] = item;
-    std::rotate(buffer + pos, buffer + end - 1, buffer + end);
+    std::rotate(buffer + pos, buffer + end, buffer + end + 1);
 }
 // Удаляет элементы из буфера в интервале [first, last).
 void Buffer::CircularBuffer::erase(std::size_t first, std::size_t last) {
@@ -235,7 +235,7 @@ void Buffer::CircularBuffer::erase(std::size_t first, std::size_t last) {
     if (!is_linearized()) {
         linearize();
     }
-    std::rotate(buffer + first, buffer + last + 1, buffer + end);
+    std::rotate(buffer + first, buffer + last + 1, buffer + end + 1);
     end -= last - first + 1;
 }
 // Очищает буфер.
