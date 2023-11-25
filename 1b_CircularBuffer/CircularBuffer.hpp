@@ -81,8 +81,8 @@ class CircularBuffer {
     value_type* buffer;
     std::size_t sizeBuff;
     std::size_t capacityBuff;
-    std::size_t begin = 0;
-    std::size_t end = 0;
+    std::size_t begin;
+    std::size_t end;
 };
 
 bool operator==(const CircularBuffer& a, const CircularBuffer& b);

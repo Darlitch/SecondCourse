@@ -146,7 +146,6 @@ TEST(Modificators, Linearize) {
     ASSERT_EQ(cb3.at(2), 'd');
     ASSERT_EQ(cb3.is_linearized(), true);
     cb.push_back('n');
-
 }
 
 TEST(Modificators, Rotate) {
@@ -289,7 +288,7 @@ TEST(Other, At) {
     cb.at(1) = 'b';
     ASSERT_EQ('b', cb.at(1));
     ASSERT_EQ('b', cb.back());
-} 
+}
 
 TEST(Other, FrontAndBack) {
     CircularBuffer cb(2, 'c');

@@ -21,7 +21,7 @@ Buffer::CircularBuffer::CircularBuffer(const CircularBuffer& cb) {
 }
 
 // Конструирует буфер заданной ёмкости.
-Buffer::CircularBuffer::CircularBuffer(std::size_t capacity) : sizeBuff{0}, capacityBuff{capacity} {
+Buffer::CircularBuffer::CircularBuffer(std::size_t capacity) : sizeBuff{0}, capacityBuff{capacity}, begin{0}, end{0} {
     if (capacityBuff < 2) {
         capacityBuff = 2;
     }
@@ -29,7 +29,7 @@ Buffer::CircularBuffer::CircularBuffer(std::size_t capacity) : sizeBuff{0}, capa
 }
 
 // Конструирует буфер заданной ёмкости, целиком заполняет его элементом elem.
-Buffer::CircularBuffer::CircularBuffer(std::size_t capacity, const value_type& elem) : sizeBuff{capacity}, capacityBuff{capacity}, end{capacity - 1} {
+Buffer::CircularBuffer::CircularBuffer(std::size_t capacity, const value_type& elem) : sizeBuff{capacity}, capacityBuff{capacity}, begin{0}, end{capacity - 1} {
     if (capacityBuff < 2) {
         capacityBuff = 2;
     }
@@ -47,28 +47,34 @@ const value_type& Buffer::CircularBuffer::operator[](std::size_t i) const {
 
 // Доступ по индексу. Методы бросают исключение в случае неверного индекса.
 value_type& Buffer::CircularBuffer::at(std::size_t i) {
-    if (i >= capacityBuff) throw std::out_of_range("Invalid index");  // ДОРАБОТАТЬ ИСКЛЮЧЕНИЯ
+    if (i >= capacityBuff)
+        throw std::out_of_range("Invalid index");  // ДОРАБОТАТЬ ИСКЛЮЧЕНИЯ
     return buffer[(i + begin) % capacityBuff];
 }
 const value_type& Buffer::CircularBuffer::at(std::size_t i) const {
-    if (i >= capacityBuff) throw std::out_of_range("Invalid index");  // ДОРАБОТАТЬ ИСКЛЮЧЕНИЯ
+    if (i >= capacityBuff)\
+        throw std::out_of_range("Invalid index");  // ДОРАБОТАТЬ ИСКЛЮЧЕНИЯ
     return buffer[(i + begin) % capacityBuff];
 }
 
 value_type& Buffer::CircularBuffer::front() {
-    if (empty()) throw std::out_of_range("Buffer empty");
+    if (empty())
+        throw std::out_of_range("Buffer empty");
     return buffer[begin];
 }  // Ссылка на первый элемент.
 value_type& Buffer::CircularBuffer::back() {
-    if (empty()) throw std::out_of_range("Buffer empty");
+    if (empty())
+        throw std::out_of_range("Buffer empty");
     return buffer[end];
 }  // Ссылка на последний элемент.
 const value_type& Buffer::CircularBuffer::front() const {
-    if (empty()) throw std::out_of_range("Buffer empty");
+    if (empty())
+        throw std::out_of_range("Buffer empty");
     return buffer[begin];
 }
 const value_type& Buffer::CircularBuffer::back() const {
-    if (empty()) throw std::out_of_range("Buffer empty");
+    if (empty())
+        throw std::out_of_range("Buffer empty");
     return buffer[end];
 }
 
@@ -79,7 +85,7 @@ value_type* Buffer::CircularBuffer::linearize() {
     std::rotate(buffer, buffer + begin, buffer + capacityBuff);
     begin = 0;
     end = sizeBuff - 1;
-    return buffer; 
+    return buffer;
 }
 // Проверяет, является ли буфер линеаризованным.
 bool Buffer::CircularBuffer::is_linearized() const {
@@ -249,11 +255,8 @@ bool Buffer::operator==(const CircularBuffer& a, const CircularBuffer& b) {
     if (a.size() != b.size()) {
         return false;
     }
-    if (a.capacity() != b.capacity()) {
-        return false;
-    }
     for (size_t i = 0; i < a.size(); ++i) {
-        if (a.at(i) != b.at(i)) {
+        if (a[i] != b[i]) {
             return false;
         }
     }
