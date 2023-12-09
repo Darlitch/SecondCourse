@@ -3,13 +3,13 @@
 
 #include "PrisonersDilemma.hpp"
 
-std::size_t MenuDetails(int argc, char** argv, std::vector<std::string>& strats) {
+std::size_t MenuDetails(int argc, char** argv, std::vector<std::string>& strats, std::string mode) {
     int steps = 0;
     for (std::size_t i = 1; i <= argc; ++i) {
         std::string currArg(argv[i]);
         if (currArg.find("--mode") != std::string::npos) {
-            strats[0].clear();
-            strats[0].append(argv[i] + 7);
+            mode.clear();
+            mode.append(argv[i] + 7);
         } else if (currArg.find("--configs=") != std::string::npos) {
             strats[1].clear();
             strats[1].append(argv[i] + 10);
@@ -28,12 +28,12 @@ std::size_t MenuDetails(int argc, char** argv, std::vector<std::string>& strats)
     return steps;
 }
 
-void CheckInput(std::vector<std::string> strats, std::size_t steps) {
-    if (strats[0] != "detailed" && strats[0] != "fast" && strats[0] != "tournament") {
+void CheckInput(std::size_t size, std::size_t steps, std::string mode) {
+    if (mode != "detailed" && mode != "fast" && mode != "tournament") {
         throw std::out_of_range("Wrong mode!");
-    } else if ((strats[0] == "detailed" || strats[0] == "fast") && strats.size() != 6) {
+    } else if ((mode == "detailed" || mode == "fast") && size != 5) {
         throw std::out_of_range("Wrong number of strategies!");
-    } else if (strats[0] == "tournament" && (strats.size() > 12 || strats.size() < 7)) {
+    } else if (mode == "tournament" && (size > 12 || size < 6)) {
         throw std::out_of_range("Wrong number of strategies!");
     } else if (steps == 0) {
         throw std::out_of_range("Incorrect number of steps!");
@@ -41,23 +41,18 @@ void CheckInput(std::vector<std::string> strats, std::size_t steps) {
 }
 
 int main(int argc, char* argv[]) {
-    std::vector<std::string> strats = {"detailed", "0", "0"};  // доработать с steps and matrix
+    std::vector<std::string> strats = {"0", "0"}; 
+    std::string mode = "detailed";
     std::size_t steps = 5;
     try {
-        steps = MenuDetails(argc, argv, strats);
-        CheckInput(strats, steps);
+        steps = MenuDetails(argc, argv, strats, mode);
+        CheckInput(strats.size(), steps, mode);
     } catch (std::string str) {
         std::cout << str << std::endl;
         return 1;
     }
 
-    PrisonersDilemma game(strats.size() - 3);
-    if (strats[0] == "detailed") {
-        game.DetailedGame(strats);
-    } else if (strats[0] == "fast") {
-        game.FastGame(strats);
-    } else {
-        game.TournamentGame(strats);
-    }
+    PrisonersDilemma game(strats.size() - 2, steps);
+    game.Game(strats, mode);
     return 0;
 }
