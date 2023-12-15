@@ -36,7 +36,9 @@ void PrisonersDilemma::Game(std::vector<std::string> cfg, std::string mode) {
     PrintWinner(cfg);
 }
 
-// void PrisonersDilemma::DetailedGame() {}
+void PrisonersDilemma::DetailedGame() {
+    std::cout << "DetailedGame!!!" << std::endl;
+}
 
 void PrisonersDilemma::FastGame() {
     std::string lastStep;
@@ -50,7 +52,9 @@ void PrisonersDilemma::FastGame() {
     }
 }
 
-// void PrisonersDilemma::TournamentGame() {}
+void PrisonersDilemma::TournamentGame() {
+    std::cout << "TournamentGame!!!" << std::endl;
+}
 
 void PrisonersDilemma::CreateMatrix(std::string matrixName) {
     std::string line;
@@ -79,5 +83,5 @@ void PrisonersDilemma::PrintWinner(std::vector<std::string> cfg) {
             winner = i;
         }
     }
-    std::cout << "Player " << cfg[winner + 2] << "WIN!" << std::endl;
+    std::cout << "Player(" << winner << "): " << cfg[winner + 2] << " WIN!" << std::endl;
 }

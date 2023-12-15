@@ -3,11 +3,11 @@
 
 #include "PrisonersDilemma.hpp"
 
-std::size_t MenuDetails(int argc, char** argv, std::vector<std::string>& cfg, std::string mode) {
+std::size_t MenuDetails(int argc, char** argv, std::vector<std::string>& cfg, std::string& mode) {
     int steps = 0;
-    for (std::size_t i = 1; i <= argc; ++i) {
+    for (int i = 1; i < argc; ++i) {
         std::string currArg(argv[i]);
-        if (currArg.find("--mode") != std::string::npos) {
+        if (currArg.find("--mode=") != std::string::npos) {
             mode.clear();
             mode.append(argv[i] + 7);
         } else if (currArg.find("--configs=") != std::string::npos) {
@@ -40,8 +40,8 @@ void CheckInput(std::size_t size, std::size_t steps, std::string mode) {
     }
 }
 
-int main(int argc, char* argv[]) {
-    std::vector<std::string> cfg = {"0", "0"}; 
+int main(int argc, char** argv) {
+    std::vector<std::string> cfg = {"0", "matrix.txt"};
     std::string mode = "detailed";
     std::size_t steps = 5;
     try {
@@ -51,7 +51,6 @@ int main(int argc, char* argv[]) {
         std::cout << str << std::endl;
         return 1;
     }
-
     PrisonersDilemma game(steps, cfg);
     game.Game(cfg, mode);
     return 0;

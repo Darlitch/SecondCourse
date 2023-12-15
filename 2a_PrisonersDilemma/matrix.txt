@@ -1,0 +1,8 @@
+ccc 777
+ccd 339
+cdc 393
+dcc 933
+cdd 055
+dcd 505
+ddc 550
+ddd 111

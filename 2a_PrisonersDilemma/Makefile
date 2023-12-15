@@ -1,4 +1,4 @@
-CMAKE = -Wall -Weror -Wextra
+FLAGS = -Wall -Werror -Wextra
 LIBS =--coverage -lgtest -lgmock -pthread -lgtest_main -lrt
 FILES = $(wildcard *.cpp)
 CC = g++
@@ -10,7 +10,7 @@ build: $(FILES)
 	$(CC) $(FLAGS) $(FILES) $(LIBS) -o $(OUTFILE)
 
 run_test:
-	./$(OUTFILE)
+	./$(OUTFILE) strat1 strat2 strat1 --steps=5 --mode=fast
 
 lcov: build
 	./$(OUTFILE)
@@ -19,4 +19,4 @@ lcov: build
 	rm -f $(OUTFILE) $(OUTFILE).info .gc
 
 clean:
-	rm -rf buffer report *.gcda *.gcno
+	rm -rf $(OUTFILE) report *.gcda *.gcno
