@@ -7,35 +7,35 @@ class AbstractStrategy {
    public:
     AbstractStrategy() {}
     virtual ~AbstractStrategy() {}
-    virtual bool Move() = 0;
+    virtual char Move(std::string lastStep, std::size_t plr) = 0;
 };
 
 class Strat1 : public AbstractStrategy {
    public:
     Strat1() {}
     ~Strat1() {}
-    bool Move();
+    char Move(std::string lastStep, std::size_t plr);
 };
 
 class Strat2 : public AbstractStrategy {
    public:
     Strat2() {}
     ~Strat2() {}
-    bool Move();
+    char Move(std::string lastStep, std::size_t plr);
 };
 
 class Strat3 : public AbstractStrategy {
    public:
     Strat3() {}
     ~Strat3() {}
-    bool Move();
+    char Move(std::string lastStep, std::size_t plr);
 };
 
 class StratCfg : public AbstractStrategy {
    public:
     StratCfg() {}
     ~StratCfg() {}
-    bool Move();
+    char Move(std::string lastStep, std::size_t plr);
 };
 
 #endif

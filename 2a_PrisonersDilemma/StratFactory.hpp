@@ -1,10 +1,11 @@
 #ifndef STRAT_FACTORY_HPP_
 #define STRAT_FACTORY_HPP_
 
+#include <functional>
 #include <iostream>
 #include <map>
 
-template <class TypeKey, class Base, class ProductType = Base* (*)> //std::invokable
+template <class TypeKey, class Base, class ProductType = std::function<Base*()>>  // std::invokable
 class StratFactory {
    public:
     ~StratFactory() {}
@@ -14,7 +15,7 @@ class StratFactory {
     bool RegisterStrat(const TypeKey& key, ProductType Func) {
         auto it = stratFactory.find(key);
         if (it == stratFactory.end()) {
-            stratFactory[key] = Func();
+            stratFactory[key] = Func;
             return true;
         }
         return false;

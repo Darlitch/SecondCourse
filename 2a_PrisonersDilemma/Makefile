@@ -1,4 +1,4 @@
-mCMAKE = -Wall -Weror -Wextra
+CMAKE = -Wall -Weror -Wextra
 LIBS =--coverage -lgtest -lgmock -pthread -lgtest_main -lrt
 FILES = $(wildcard *.cpp)
 CC = g++
