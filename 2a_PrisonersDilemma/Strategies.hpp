@@ -13,29 +13,29 @@ class AbstractStrategy {
 class Strat1 : public AbstractStrategy {
    public:
     Strat1() {}
-    virtual ~Strat1() {}
-    virtual bool Move();
+    ~Strat1() {}
+    bool Move();
 };
 
 class Strat2 : public AbstractStrategy {
    public:
     Strat2() {}
-    virtual ~Strat2() {}
-    virtual bool Move();
+    ~Strat2() {}
+    bool Move();
 };
 
 class Strat3 : public AbstractStrategy {
    public:
     Strat3() {}
-    virtual ~Strat3() {}
-    virtual bool Move();
+    ~Strat3() {}
+    bool Move();
 };
 
 class StratCfg : public AbstractStrategy {
    public:
     StratCfg() {}
-    virtual ~StratCfg() {}
-    virtual bool Move();
+    ~StratCfg() {}
+    bool Move();
 };
 
 #endif
