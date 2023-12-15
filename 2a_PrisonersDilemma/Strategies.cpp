@@ -56,22 +56,24 @@ bool Reg2() {
 const bool strat2 = Reg2();
 }  // namespace
 
-// char Strat3::Move(std::string lastStep, std::size_t plr) {
-//     std::cout << "Strat3!!!" << std::endl;
-//     return 1;
-// }
+char Strat3::Move(std::string lastStep, std::size_t plr) {
+    char c = 'c';
+    if (lastStep[plr] == c) {
+        c = 'd';
+    }
+    return c;
+}
 
-// namespace {
-// AbstractStrategy* CreateStrat3() {
-//     return new Strat3;
-// }
-// bool Reg3() {
-//     std::cout << "reg3" << std::endl;
-//     return StratFactory<std::string, AbstractStrategy>::GetInstance()
-//         ->RegisterStrat("strat3", CreateStrat3);
-// }
-// const bool strat3 = Reg3();
-// }  // namespace
+namespace {
+AbstractStrategy* CreateStrat3() {
+    return new Strat3;
+}
+bool Reg3() {
+    return StratFactory<std::string, AbstractStrategy>::GetInstance()
+        ->RegisterStrat("strat3", CreateStrat3);
+}
+const bool strat3 = Reg3();
+}  // namespace
 
 // char StratCfg::Move(std::string lastStep, std::size_t plr) {
 //     std::cout << "StratCfg!!!" << std::endl;

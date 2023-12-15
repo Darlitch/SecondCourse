@@ -1,16 +1,22 @@
-FLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra
 LIBS =--coverage -lgtest -lgmock -pthread -lgtest_main -lrt
-FILES = $(wildcard *.cpp)
+SOURCE = $(wildcard *.cpp)
+OBGMAIN = PrisonersDilemma.o Strategies.o Menu.o
 CC = g++
 OUTFILE = dilema
 
-all: build run_test
+all: clean build run_test 
 
-build: $(FILES)
-	$(CC) $(FLAGS) $(FILES) $(LIBS) -o $(OUTFILE)
+build: create_objects $(OBJMAIN)
+	$(CC) $(OBGMAIN) $(LIBS) -o $(OUTFILE)
+
+create_objects: $(SOURCE)
+	$(CC) $(CFLAGS) -c PrisonersDilemma.cpp
+	$(CC) $(CFLAGS) -c Strategies.cpp
+	$(CC) $(CFLAGS) -c Menu.cpp
 
 run_test:
-	./$(OUTFILE) strat1 strat2 strat1 --steps=5 --mode=fast
+	./$(OUTFILE) strat1 strat2 strat1 --steps=5 --mode=detailed
 
 lcov: build
 	./$(OUTFILE)
@@ -19,4 +25,4 @@ lcov: build
 	rm -f $(OUTFILE) $(OUTFILE).info .gc
 
 clean:
-	rm -rf $(OUTFILE) report *.gcda *.gcno
+	rm -rf $(OUTFILE) report *.gcda *.gcno *.o

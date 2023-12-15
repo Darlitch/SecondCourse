@@ -36,19 +36,30 @@ void PrisonersDilemma::Game(std::vector<std::string> cfg, std::string mode) {
     PrintWinner(cfg);
 }
 
+void PrisonersDilemma::OneStep(std::string& lastStep) {
+    std::string currStep;
+    for (auto it : currPlr) {
+        currStep.push_back(strats[it]->Move(lastStep, it));
+    }
+    AddScoreFromMatrix(currStep);
+    lastStep = currStep;
+}
+
 void PrisonersDilemma::DetailedGame() {
-    std::cout << "DetailedGame!!!" << std::endl;
+    std::string lastStep;
+    for (std::size_t i = 0; i < steps_; ++i) {
+        std::cout << scores[0] << ' ' << scores[1] << ' ' << scores[2] << std::endl;
+        OneStep(lastStep);
+        std::cout << "step " << i+1 << ":" << std::endl;
+        std::cout << lastStep[0] << ' ' << lastStep[1] << ' ' << lastStep[2] << std::endl;
+        std::cout << scores[0] << ' ' << scores[1] << ' ' << scores[2] << std::endl;
+    }
 }
 
 void PrisonersDilemma::FastGame() {
     std::string lastStep;
     for (std::size_t i = 0; i < steps_; ++i) {
-        std::string currStep;
-        for (auto it : currPlr) {
-            currStep.push_back(strats[it]->Move(lastStep, it));
-        }
-        AddScoreFromMatrix(currStep);
-        lastStep = currStep;
+        OneStep(lastStep);
     }
 }
 
@@ -71,7 +82,7 @@ void PrisonersDilemma::AddScoreFromMatrix(std::string step) {
     int scoreLine = matrix[step];
     scores[currPlr[0]] += scoreLine / 100;
     scores[currPlr[1]] += (scoreLine / 10) % 10;
-    scores[currPlr[0]] += scoreLine % 10;
+    scores[currPlr[2]] += scoreLine % 10;
 }
 
 void PrisonersDilemma::PrintWinner(std::vector<std::string> cfg) {

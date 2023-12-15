@@ -17,6 +17,7 @@ class PrisonersDilemma {
     PrisonersDilemma& operator=(PrisonersDilemma& pd) = delete;
 
     void Game(std::vector<std::string> cfg, std::string mode);
+    void OneStep(std::string& lastStep);
     void DetailedGame();
     void FastGame();
     void TournamentGame();
