@@ -75,19 +75,22 @@ bool Reg3() {
 const bool strat3 = Reg3();
 }  // namespace
 
-// char StratCfg::Move(std::string lastStep, std::size_t plr) {
-//     std::cout << "StratCfg!!!" << std::endl;
-//     return 1;
-// }
+void StratCfg::UpdateStrat(std::string fileName) {
+}
 
-// namespace {
-// AbstractStrategy* CreateStratCfg() {
-//     return new StratCfg;
-// }
-// bool RegCfg() {
-//     std::cout << "regcfg" << std::endl;
-//     return StratFactory<std::string, AbstractStrategy>::GetInstance()
-//         ->RegisterStrat("stratCfg", CreateStratCfg);
-// }
-// const bool stratCfg = RegCfg();
-// }  // namespace
+char StratCfg::Move(std::string lastStep, std::size_t plr) {
+    std::cout << "StratCfg!!!" << std::endl;
+    return 1;
+}
+
+namespace {
+AbstractStrategy* CreateStratCfg() {
+    return new StratCfg;
+}
+bool RegCfg() {
+    std::cout << "regcfg" << std::endl;
+    return StratFactory<std::string, AbstractStrategy>::GetInstance()
+        ->RegisterStrat("stratCfg", CreateStratCfg);
+}
+const bool stratCfg = RegCfg();
+}  // namespace

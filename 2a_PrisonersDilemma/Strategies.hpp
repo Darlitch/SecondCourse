@@ -35,7 +35,11 @@ class StratCfg : public AbstractStrategy {
    public:
     StratCfg() {}
     ~StratCfg() {}
+    void UpdateStrat(std::string fileName);
     char Move(std::string lastStep, std::size_t plr);
+
+   private:
+    std::map<std::string, std::string> stratMap;
 };
 
 #endif

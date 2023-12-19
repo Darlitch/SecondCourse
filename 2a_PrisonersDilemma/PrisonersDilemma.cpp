@@ -48,7 +48,6 @@ void PrisonersDilemma::OneStep(std::string& lastStep) {
 void PrisonersDilemma::DetailedGame() {
     std::string lastStep;
     for (std::size_t i = 0; i < steps_; ++i) {
-        std::cout << scores[0] << ' ' << scores[1] << ' ' << scores[2] << std::endl;
         OneStep(lastStep);
         std::cout << "step " << i+1 << ":" << std::endl;
         std::cout << lastStep[0] << ' ' << lastStep[1] << ' ' << lastStep[2] << std::endl;
@@ -64,7 +63,23 @@ void PrisonersDilemma::FastGame() {
 }
 
 void PrisonersDilemma::TournamentGame() {
-    std::cout << "TournamentGame!!!" << std::endl;
+    std::string lastStep;
+    for (std::size_t i = 0; i < steps_; ++i) {
+        std::cout << "step " << i << ':' << std::endl;
+        for (std::size_t j = 0; j < strats.size() - 1; ++j) {
+            OneStep(lastStep);
+            std::cout << currPlr[0] << ' ' << currPlr[1] << ' ' << currPlr[2] << ':' << std::endl;
+            std::cout << lastStep[0] << ' ' << lastStep[1] << ' ' << lastStep[2] << std::endl;
+            std::cout << "score:" << std::endl;
+            for (std::size_t k = 0; k < scores.size(); ++k) {
+                std::cout << scores[k] << ' ';
+            }
+            std::cout << std::endl << std::endl;
+            currPlr[0] = (currPlr[0] + 1) % currPlr.size();
+            currPlr[1] = (currPlr[1] + 1) % currPlr.size();
+            currPlr[2] = (currPlr[2] + 1) % currPlr.size();
+        }
+    }
 }
 
 void PrisonersDilemma::CreateMatrix(std::string matrixName) {

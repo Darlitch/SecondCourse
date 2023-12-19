@@ -4,7 +4,7 @@
 #include "PrisonersDilemma.hpp"
 
 std::size_t MenuDetails(int argc, char** argv, std::vector<std::string>& cfg, std::string& mode) {
-    int steps = 0;
+    int steps = 5;
     for (int i = 1; i < argc; ++i) {
         std::string currArg(argv[i]);
         if (currArg.find("--mode=") != std::string::npos) {
