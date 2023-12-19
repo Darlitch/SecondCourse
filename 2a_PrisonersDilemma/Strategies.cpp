@@ -1,5 +1,20 @@
 #include "Strategies.hpp"
 
+#include <fstream>
+
+void AbstractStrategy::UpdateStrat(std::string fileName) {
+    if (fileName != "") {
+        std::string line;
+        std::ifstream file(fileName);
+        if (file.is_open()) {
+            while (std::getline(file, line)) {
+                stratMap[line.substr(0, 3)] = line.substr(4);
+            }
+            file.close();
+        }
+    }
+}
+
 char Strat1::Move(std::string lastStep, std::size_t plr) {
     char c = 'c';
     switch (plr) {
@@ -24,6 +39,10 @@ char Strat1::Move(std::string lastStep, std::size_t plr) {
     return c;
 }
 
+void Strat1::UpdateStrat(std::string fileName) {
+    AbstractStrategy::UpdateStrat(fileName);
+}
+
 namespace {
 AbstractStrategy* CreateStrat1() {
     return new Strat1;
@@ -45,6 +64,10 @@ char Strat2::Move(std::string lastStep, std::size_t plr) {
     return c;
 }
 
+void Strat2::UpdateStrat(std::string fileName) {
+    AbstractStrategy::UpdateStrat(fileName);
+}
+
 namespace {
 AbstractStrategy* CreateStrat2() {
     return new Strat2;
@@ -64,6 +87,10 @@ char Strat3::Move(std::string lastStep, std::size_t plr) {
     return c;
 }
 
+void Strat3::UpdateStrat(std::string fileName) {
+    AbstractStrategy::UpdateStrat(fileName);
+}
+
 namespace {
 AbstractStrategy* CreateStrat3() {
     return new Strat3;
@@ -75,12 +102,15 @@ bool Reg3() {
 const bool strat3 = Reg3();
 }  // namespace
 
-void StratCfg::UpdateStrat(std::string fileName) {
+char StratCfg::Move(std::string lastStep, std::size_t plr) {
+    char c;
+    std::string line = stratMap[lastStep];
+    c = line[plr];
+    return c;
 }
 
-char StratCfg::Move(std::string lastStep, std::size_t plr) {
-    std::cout << "StratCfg!!!" << std::endl;
-    return 1;
+void StratCfg::UpdateStrat(std::string fileName) {
+    AbstractStrategy::UpdateStrat(fileName);
 }
 
 namespace {
