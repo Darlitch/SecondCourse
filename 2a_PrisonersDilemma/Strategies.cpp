@@ -104,8 +104,12 @@ const bool strat3 = Reg3();
 
 char StratCfg::Move(std::string lastStep, std::size_t plr) {
     char c;
+    if (lastStep == "") {
+        lastStep = "www";
+    }
     std::string line = stratMap[lastStep];
     c = line[plr];
+    std::cout << "c:" << c << std::endl;
     return c;
 }
 
@@ -118,7 +122,6 @@ AbstractStrategy* CreateStratCfg() {
     return new StratCfg;
 }
 bool RegCfg() {
-    std::cout << "regcfg" << std::endl;
     return StratFactory<std::string, AbstractStrategy>::GetInstance()
         ->RegisterStrat("stratCfg", CreateStratCfg);
 }
