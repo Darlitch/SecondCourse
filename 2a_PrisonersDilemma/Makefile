@@ -16,7 +16,7 @@ create_objects: $(SOURCE)
 	$(CC) $(CFLAGS) -c Menu.cpp
 
 run_test:
-	./$(OUTFILE) strat6.txt strat5.txt strat4.txt strat1 --steps=5 --mode=tournament --configs=config
+	./$(OUTFILE) strat6.txt strat5.txt strat4.txt --steps=5 --mode=fast --configs=config
 
 lcov: build
 	./$(OUTFILE)

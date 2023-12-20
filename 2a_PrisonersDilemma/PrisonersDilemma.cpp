@@ -58,8 +58,8 @@ void PrisonersDilemma::DetailedGame() {
         OneStep(lastStep);
         std::cout << "step " << i + 1 << ":" << std::endl;
         std::cout << lastStep[0] << ' ' << lastStep[1] << ' ' << lastStep[2] << std::endl;
-        std::cout << scores[0] << ' ' << scores[1] << ' ' << scores[2] << std::endl
-                  << std::endl;
+        std::cout << scores[0] << ' ' << scores[1] << ' ' << scores[2] << std::endl;
+        getchar();
     }
 }
 

@@ -109,7 +109,6 @@ char StratCfg::Move(std::string lastStep, std::size_t plr) {
     }
     std::string line = stratMap[lastStep];
     c = line[plr];
-    std::cout << "c:" << c << std::endl;
     return c;
 }
 
