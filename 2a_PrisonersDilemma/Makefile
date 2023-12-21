@@ -1,28 +1,34 @@
 CFLAGS = -Wall -Werror -Wextra
-LIBS =--coverage -lgtest -lgmock -pthread -lgtest_main -lrt
-SOURCE = $(wildcard *.cpp)
-OBGMAIN = PrisonersDilemma.o Strategies.o Menu.o
+LIBS = -lgtest -lgmock -pthread -lgtest_main -lrt
+SOURCE = PrisonersDilemma.cpp Strategies.cpp Menu.cpp
+SOURCETEST = PrisonersDilemma.cpp Strategies.cpp Test.cpp
 CC = g++
 OUTFILE = dilema
+TESTFILE = tests
+ARGV = strat6.txt strat5.txt strat4.txt --steps=5 --mode=fast --configs=config
+GCOV = --coverag
 
-all: clean build run_test 
+all: build_main run_main
 
-build: create_objects $(OBJMAIN)
-	$(CC) $(OBGMAIN) $(LIBS) -o $(OUTFILE)
+tests: build_tests run_tests
 
-create_objects: $(SOURCE)
-	$(CC) $(CFLAGS) -c PrisonersDilemma.cpp
-	$(CC) $(CFLAGS) -c Strategies.cpp
-	$(CC) $(CFLAGS) -c Menu.cpp
+build_main: clean
+	$(CC) $(CFLAGS) $(SOURCE) $(LIBS) -o $(OUTFILE)
 
-run_test:
-	./$(OUTFILE) strat6.txt strat5.txt strat4.txt --steps=5 --mode=fast --configs=config
+build_tests: clean
+	$(CC) $(CFLAGS) $(SOURCETEST) $(LIBS) $(GCOV) -o $(TESTFILE)
 
-lcov: build
-	./$(OUTFILE)
-	lcov --no-external -t "test" -o $(OUTFILE).info -c -d .
-	genhtml -o report $(OUTFILE).info
-	rm -f $(OUTFILE) $(OUTFILE).info .gc
+run_main:
+	./$(OUTFILE) $(ARGV)
+
+run_tests:
+	./$(TESTFILE) 
+
+lcov: tests
+	./$(TESTFILE)
+	lcov --no-external -t "test" -o $(TESTFILE).info -c -d .
+	genhtml -o report $(TESTFILE).info
+	rm -f $(TESTFILE) $(TESTFILE).info .gc
 
 clean:
-	rm -rf $(OUTFILE) report *.gcda *.gcno *.o
+	rm -rf $(OUTFILE) $(TESTFILE) report *.gcda *.gcno *.o *.info
