@@ -1,0 +1,9 @@
+www cdd
+ccc ddd
+ccd ddc
+cdc dcd
+dcc cdd
+cdd dcc
+dcd cdc
+ddc ccd
+ddd ccc
