@@ -2,11 +2,18 @@
 
 #include "Exeption.hpp"
 
+CfgReader& CfgReader::operator=(const CfgReader& cr) {
+    if (cfg.is_open()) {
+        cfg.close();
+    }
+    fileName_ = cr.fileName_;
+    OpenFile();
+    return *this;
+}
+
 bool CfgReader::OpenFile() {
     cfg.open(fileName_);
-    if (!cfg.is_open()) {
-        throw FileOpenException(fileName_);
-    }
+    return cfg.is_open();
 }  // ?
 
 bool CfgReader::CloseFile() {

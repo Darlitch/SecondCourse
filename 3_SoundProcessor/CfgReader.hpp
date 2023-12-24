@@ -12,6 +12,8 @@ class CfgReader {
     CfgReader(std::string fileName) : fileName_(fileName) {}
     ~CfgReader() {}
 
+    CfgReader& operator=(const CfgReader& cr);
+
     bool OpenFile();  // ?
     bool CloseFile();
     std::vector<std::string> GetCfg();
