@@ -1,4 +1,4 @@
-#ifndef SOUND_PROCESSOR_
-#define SOUND_PROCESSOR_
+#ifndef SOUND_PROCESSOR_HPP_
+#define SOUND_PROCESSOR_HPP_
 
-#endif
+#endif  // SOUND_PROCESSOR_HPP_

@@ -20,6 +20,6 @@ class ConvertFactory {
             throw SoundProcessorException("Invalid Converter Parameter");
         }
     }
-}
+};
 
-#endif
+#endif  // CONVERT_FACTORY_HPP_

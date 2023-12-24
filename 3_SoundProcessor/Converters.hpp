@@ -27,4 +27,4 @@ class AddVolumeConverter : public AbstractConverter {
     short volume;
 };
 
-#endif
+#endif  // CONVERTERS_HPP_

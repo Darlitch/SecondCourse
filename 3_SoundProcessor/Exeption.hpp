@@ -1,5 +1,5 @@
 #ifndef EXEPTION_HPP_
-#define EXEPTION_HPPP
+#define EXEPTION_HPP_
 
 #include <iostream>
 #include <stdexcept>
@@ -24,4 +24,4 @@ class FileOpenException : public SoundProcessorException {
     explicit FileOpenException(const std::string& filename) : SoundProcessorException("Failed to open file: " + filename) {}
 };
 
-#endif
+#endif  // EXEPTION_HPP_
