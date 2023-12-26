@@ -14,7 +14,7 @@ CfgReader& CfgReader::operator=(const CfgReader& cr) {
 bool CfgReader::OpenFile() {
     cfg.open(fileName_);
     return cfg.is_open();
-}  // ?
+}
 
 bool CfgReader::CloseFile() {
     cfg.close();
