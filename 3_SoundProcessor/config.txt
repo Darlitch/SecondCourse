@@ -1,0 +1,7 @@
+# sdfsdf
+mute 1 30
+
+mix $2 40
+
+#add 15 1
+

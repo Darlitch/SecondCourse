@@ -4,6 +4,7 @@ FILES = $(wildcard *.cpp)
 CC = g++
 OUTFILE = ./buffer
 
+
 all: build run_test
 
 build: $(FILES)
