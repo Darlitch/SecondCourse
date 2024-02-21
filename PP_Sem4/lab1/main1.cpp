@@ -46,7 +46,7 @@ void RandomVectorX(double* x) {
     }
 }
 
-void CountVectorB(matrix_cont& matrix, double* x, double* b) {
+void AMultX(matrix_cont& matrix, double* x, double* b) {
     int size, rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -60,20 +60,51 @@ void CountVectorB(matrix_cont& matrix, double* x, double* b) {
     }
 }
 
-//Module
-//Checker
+void SubB(double* x1, double* b) {
+    for (std::size_t i = 0; i < N; ++i) {
+        x1[i] -= b[i];
+    }
+}
+
+void MultT(double* x1) {
+    for (std::size_t i = 0; i < N; ++i) {
+        x1[i] *= t;
+    }
+}
+
+void SubXX(double* x0, double* x1) {
+    for (std::size_t i = 0; i < N; ++i) {
+        x0[i] -= x1[i];
+    }
+}
+
+double Module(double* u) {
+    double a = 0;
+    for (std::size_t i = 0; i < N; ++i) {
+        a += u[i];
+    }
+    return a;
+}
 
 void SearchX(matrix_cont& matrix, double* x, double* b) {
     double x0[N];
     double x1[N];
+    double u;
     int size, rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     std::size_t lraws = FindLraws(size, rank);
     std::size_t matrixBegin = FindBegin(size, rank);
+    AMultX(matrix, x0, x1);
+    SubB(x1, b);
     do {
-
-    } while ()
+        MultT(x1);
+        SubXX(x0, x1);
+        AMultX(matrix, x0, x1);
+        SubB(x1, b);
+        u = Module(x1);
+    } while ((u / Module(b)) < e);
+    std::cout << "Vector found" << std::endl;
 }
 
 int main(int argc, char** argv) {
@@ -89,7 +120,7 @@ int main(int argc, char** argv) {
         RandomVectorX(x);
     }
     MPI_Bcast(x, N, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    CountVectorB(matrix, x, b);
+    AMultX(matrix, x, b);
     SearchX(matrix, x, b);
     MPI_Finalize();
     return 0;
