@@ -1,5 +1,6 @@
 #include <mpi.h>
 
+#include <cmath>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
@@ -48,6 +49,7 @@ void RandomVectorX(double* x) {
 
 void AMultX(matrix_cont& matrix, double* x, double* b) {
     int size, rank;
+    // MPI_Barrier(MPI_COMM_WORLD);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     std::size_t lraws = FindLraws(size, rank);
@@ -58,6 +60,7 @@ void AMultX(matrix_cont& matrix, double* x, double* b) {
             MPI_Bcast(&b[i + matrixBegin], 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
         }
     }
+    // MPI_Barrier(MPI_COMM_WORLD);
 }
 
 void SubB(double* x1, double* b) {
@@ -81,9 +84,9 @@ void SubXX(double* x0, double* x1) {
 double Module(double* u) {
     double a = 0;
     for (std::size_t i = 0; i < N; ++i) {
-        a += u[i];
+        a += (u[i] * u[i]);
     }
-    return a;
+    return sqrt(a);
 }
 
 void SearchX(matrix_cont& matrix, double* x, double* b) {
@@ -98,12 +101,23 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
     AMultX(matrix, x0, x1);
     SubB(x1, b);
     do {
+        // for (std::size_t i = 0; i < N; ++i) {
+        //     std::cout << x[i] << " ";
+        // }
+        // std::cout << std::endl;
+        // for (std::size_t i = 0; i < N; ++i) {
+        //     std::cout << x1[i] << " - ";
+        // }
+        // std::cout << std::endl;
         MultT(x1);
         SubXX(x0, x1);
         AMultX(matrix, x0, x1);
         SubB(x1, b);
         u = Module(x1);
-    } while ((u / Module(b)) < e);
+        // std::cout << u << std::endl;
+        u = u / Module(b);
+        // std::cout << u << std::endl;
+    } while (u > e);
     std::cout << "Vector found" << std::endl;
 }
 
@@ -115,12 +129,19 @@ int main(int argc, char** argv) {
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Barrier(MPI_COMM_WORLD);
     matrix_cont matrix = MatrixBuilder(size, rank);
     if (rank == 0) {
         RandomVectorX(x);
     }
     MPI_Bcast(x, N, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    for (std::size_t i = 0; i < N; ++i) {
+        std::cout << x[i] << " ";
+    }
+    std::cout << std::endl;
+    MPI_Barrier(MPI_COMM_WORLD);
     AMultX(matrix, x, b);
+    MPI_Barrier(MPI_COMM_WORLD);
     SearchX(matrix, x, b);
     MPI_Finalize();
     return 0;
