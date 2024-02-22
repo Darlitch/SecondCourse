@@ -56,7 +56,7 @@ void AMultX(matrix_cont& matrix, double* x, double* b) {
     std::size_t matrixBegin = FindBegin(size, rank);
     for (std::size_t i = 0; i < lrows; ++i) {
         for (std::size_t j = matrixBegin; j < matrixBegin + lrows; ++j) {
-            b[j] = x[j] * matrix[i][j];
+            b[i] = x[j] * matrix[i][j];
             // MPI_Barrier(MPI_COMM_WORLD);
             MPI_Bcast(&b[j], 1, MPI_DOUBLE, rank, MPI_COMM_WORLD);
             // std::cout << "1" << std::endl;

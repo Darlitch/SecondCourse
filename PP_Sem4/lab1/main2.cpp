@@ -50,6 +50,7 @@ void RandomVectorX(double* x) {
     srand(time(NULL));
     for (std::size_t i = begin; i < begin + lrows; ++i) {
         x[i] = rand() % 10;
+        std::cout << "x: " << x[i] << std::endl;
         // std::cout << "x: " << x[i] << std::endl;
     }
 }
@@ -63,7 +64,7 @@ void AMultX(double** matrix, double* x, double* b) {
     std::size_t matrixBegin = FindBegin(size, rank);
     for (std::size_t i = 0; i < lrows; ++i) {
         for (std::size_t j = matrixBegin; j < matrixBegin + lrows; ++j) {
-            b[j] += x[j] * matrix[i][j];
+            b[i + matrixBegin] += x[i + matrixBegin] * matrix[i][j];
         }
     }
     for (std::size_t j = 0; j < N; ++j) {
