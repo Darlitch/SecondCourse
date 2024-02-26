@@ -47,23 +47,47 @@ void RandomVectorX(double* x) {
     }
 }
 
+int* FindLrowsV(int size) {
+    int* array = new int[size];
+    for (int j = 0; j < size; ++j) {
+        array[j] = (N / size) + (int)(N % size > j);
+    }
+    return array;
+}
+
+int* FindBeginV(int size) {
+    int* array = new int[size];
+    for (int j = 0; j < size; j++) {
+        array[j] = FindBegin(size, j);
+    }
+    return array;
+}
+
 void AMultX(matrix_cont& matrix, double* x, double* b) {
     int size, rank;
-    // MPI_Barrier(MPI_COMM_WORLD);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     std::size_t lrows = FindLrows(size, rank);
     std::size_t matrixBegin = FindBegin(size, rank);
+    int* lrowsV = FindLrowsV(size);
+    int* beginV = FindBeginV(size);
+    double b1[lrows];
+    std::cout << "lrows: " << lrows << std::endl;
+    for (std::size_t i = 0; i < lrows; ++i) {
+        b1[i] = b[i + matrixBegin];
+    }
+    for (std::size_t i = 0; i < lrows; ++i) {
+        std::cout << b1[i] << " ";
+    }
+    std::cout << std::endl;
     for (std::size_t i = 0; i < lrows; ++i) {
         for (std::size_t j = matrixBegin; j < matrixBegin + lrows; ++j) {
-            b[i] = x[j] * matrix[i][j];
-            // MPI_Barrier(MPI_COMM_WORLD);
-            MPI_Bcast(&b[j], 1, MPI_DOUBLE, rank, MPI_COMM_WORLD);
-            // std::cout << "1" << std::endl;
-            // std::cout << "2" << std::endl;
+            b1[i] += x[i + matrixBegin] * matrix[i][j];
+            // MPI_Bcast(&b[j], 1, MPI_DOUBLE, rank, MPI_COMM_WORLD);
+            // MPI_Allgatherv(b1, lrows, MPI_DOUBLE, b, lrowsV, beginV, MPI_DOUBLE, MPI_COMM_WORLD);
         }
     }
-    // MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Allgatherv(b1, lrows, MPI_DOUBLE, b, lrowsV, beginV, MPI_DOUBLE, MPI_COMM_WORLD);
 }
 
 void SubB(double* x1, double* b) {
@@ -116,7 +140,6 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
         MultT(x1);
         SubXX(x0, x1);
         AMultX(matrix, x0, x1);
-        // MPI_Barrier(MPI_COMM_WORLD);
         SubB(x1, b);
         u = Module(x1);
         // std::cout << u << std::endl;
@@ -128,13 +151,11 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
 
 int main(int argc, char** argv) {
     int rank, size;
-    // std::vector<int> x(N);
     double x[N];
-    double b[N];
+    double b[N] = {0};
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    MPI_Barrier(MPI_COMM_WORLD);
     matrix_cont matrix = MatrixBuilder(size, rank);
     if (rank == 0) {
         RandomVectorX(x);
@@ -144,10 +165,11 @@ int main(int argc, char** argv) {
         std::cout << x[i] << " ";
     }
     std::cout << std::endl;
-    // MPI_Barrier(MPI_COMM_WORLD);
     AMultX(matrix, x, b);
-    // MPI_Barrier(MPI_COMM_WORLD);
-    std::cout << "Hello from " << rank << std::endl;
+    for (std::size_t i = 0; i < N; ++i) {
+        std::cout << b[i] << " ";
+    }
+    std::cout << std::endl;
     SearchX(matrix, x, b);
     MPI_Finalize();
     return 0;

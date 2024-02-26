@@ -18,7 +18,6 @@ std::size_t FindBegin(int size, int rank) {
     for (std::size_t i = 0; i < rank; ++i) {
         begin += ((N / size) + (int)((N % size) > i));
     }
-    std::cout << "findbegin: " << begin << std::endl;
     return begin;
 }
 
@@ -45,7 +44,6 @@ void RandomVectorX(double* x) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     std::size_t begin = FindBegin(size, rank);
-    std::cout << "begin: " << begin << std::endl;
     std::size_t lrows = FindLrows(size, rank);
     srand(time(NULL));
     for (std::size_t i = begin; i < begin + lrows; ++i) {
