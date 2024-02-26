@@ -11,38 +11,40 @@ public class MathParser {
 
     public Result PlusMinus(String s) throws Exception {
         Result curr = MultDiv(s);
+        Result curr2 = curr;
         double res = curr.res;
-        while (!curr.rest.isEmpty()) {
-            if (curr.rest.charAt(0) != '+' && curr.rest.charAt(0) != '-') {
+        while (!curr2.rest.isEmpty()) {
+            if (curr2.rest.charAt(0) != '+' && curr2.rest.charAt(0) != '-') {
                 break;
             }
-            char temp = curr.rest.charAt(0);
-            curr = MultDiv(curr.rest.substring(1));
+            char temp = curr2.rest.charAt(0);
+            curr2 = MultDiv(curr2.rest.substring(1));
             if (temp == '+') {
-                res += curr.res;
+                res += curr2.res;
             } else {
-                res -= curr.res;
+                res -= curr2.res;
             }
         }
-        return new Result(res, curr.rest);
+        return new Result(res, curr2.rest, curr2, curr);
     }
 
     public Result MultDiv(String s) throws Exception {
         Result curr = Brackets(s);
+        Result curr2 = curr;
         double res = curr.res;
-        while (!curr.rest.isEmpty()) {
-            if (curr.rest.charAt(0) != '*' && curr.rest.charAt(0) != '/') {
+        while (!curr2.rest.isEmpty()) {
+            if (curr2.rest.charAt(0) != '*' && curr2.rest.charAt(0) != '/') {
                 break;
             }
-            char temp = curr.rest.charAt(0);
-            curr = Brackets(curr.rest.substring(1));
+            char temp = curr2.rest.charAt(0);
+            curr2 = Brackets(curr2.rest.substring(1));
             if (temp == '*') {
-                res *= curr.res;
+                res *= curr2.res;
             } else {
-                res /= curr.res;
+                res /= curr2.res;
             }
         }
-        return new Result(res, curr.rest);
+        return new Result(res, curr2.rest, curr, curr2);
     }
 
     public Result Brackets(String s) throws Exception {
@@ -56,7 +58,7 @@ public class MathParser {
             return result;
         }
         Result result2 = Num(s);
-        return new Result(result2.res, result2.rest);
+        return new Result(result2.res, result2.rest, null, null);
     }
 
     public Result Num(String s) throws Exception {
@@ -80,6 +82,6 @@ public class MathParser {
         if (negative) {
             dNum = -dNum;
         }
-        return new Result (dNum, s.substring(i));
+        return new Result (dNum, s.substring(i), null, null);
     } 
 }
