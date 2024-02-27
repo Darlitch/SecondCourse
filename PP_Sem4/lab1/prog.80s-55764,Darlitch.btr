@@ -1,7 +1,0 @@
-
-prog:55764 terminated with signal 11 at PC=5604e550185a SP=7ffe795378e0.  Backtrace:
-./prog(+0x185a)[0x5604e550185a]
-./prog(+0x1c43)[0x5604e5501c43]
-/lib/x86_64-linux-gnu/libc.so.6(+0x29d90)[0x7fa9409c2d90]
-/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80)[0x7fa9409c2e40]
-./prog(+0x12a5)[0x5604e55012a5]
