@@ -1,0 +1,7 @@
+
+prog:62004 terminated with signal 11 at PC=55f0ff0f085e SP=7fff690c7f50.  Backtrace:
+./prog(+0x185e)[0x55f0ff0f085e]
+./prog(+0x1c32)[0x55f0ff0f0c32]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29d90)[0x7feae873ed90]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80)[0x7feae873ee40]
+./prog(+0x12a5)[0x55f0ff0f02a5]

@@ -1,5 +1,6 @@
 #include <mpi.h>
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
@@ -53,22 +54,44 @@ void RandomVectorX(double* x) {
     }
 }
 
+int* FindLrowsV(int size) {
+    int* array = new int[size];
+    for (int j = 0; j < size; ++j) {
+        array[j] = (N / size) + (int)(N % size > j);
+    }
+    return array;
+}
+
 void AMultX(double** matrix, double* x, double* b) {
     int size, rank;
     // MPI_Barrier(MPI_COMM_WORLD);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
+    std::cout << "size: " << size << std::endl;
     std::size_t lrows = FindLrows(size, rank);
     std::size_t matrixBegin = FindBegin(size, rank);
-    for (std::size_t i = 0; i < lrows; ++i) {
-        for (std::size_t j = matrixBegin; j < matrixBegin + lrows; ++j) {
-            b[i + matrixBegin] += x[i + matrixBegin] * matrix[i][j];
+    int* lrowsV = FindLrowsV(size);
+
+    for (std::size_t p = 0; p < size; ++p) {       // полный подсчёт по всем процессам
+        for (std::size_t i = 0; i < lrows; ++i) {  // проходимся по всем строкам матрицы
+            for (std::size_t j = matrixBegin; j < matrixBegin + lrows; ++j) {
+                b[i + matrixBegin] += x[i + matrixBegin] * matrix[i][j];
+            }
         }
+        double* x1 = new double[lrowsV[(rank + 1) % size]]();
+        // std::cout << "1" << std::endl;
+        MPI_Sendrecv(x, lrows, MPI_DOUBLE, rank, 123, x1, lrowsV[(rank + 1) % size], MPI_DOUBLE, (rank + 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Sendrecv(x, lrows, MPI_DOUBLE, (rank + 1) % size, 123, x1, lrowsV[(rank + 1) % size], MPI_DOUBLE, (rank + size - 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        std::swap(x, x1);
+        // lrows = lrowsV[(rank + p + 1) % size - 1];
+        std::rotate(lrowsV, lrowsV + 1, lrowsV + size);
+        // for (std::size_t i = 0; i < size; ++i) {
+        //     std::cout << "lrows: " << lrowsV[i] << std::endl;
+        // }
+        std::cout << "1" << std::endl;
+        delete[] x1;
     }
-    for (std::size_t j = 0; j < N; ++j) {
-        std::cout << "b:" << b[j] << std::endl;
-    }
-    std::cout << std::endl;
+    delete[] lrowsV;
 }
 
 void SubB(double* x1, double* b) {
@@ -95,8 +118,9 @@ void SearchX(double** matrix, double* x, double* b) {
 }
 
 int main(int argc, char** argv) {
+    double startTime, endTime;
     int rank, size;
-    double x[N] = {0};
+    double* x = new double[N]();
     double b[N] = {0};
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -104,27 +128,37 @@ int main(int argc, char** argv) {
     std::size_t lrows = FindLrows(size, rank);
     // MPI_Barrier(MPI_COMM_WORLD);
     double** matrix = MatrixBuilder(size, rank);
+    if (rank == 0) {
+        startTime = MPI_Wtime();
+    }
 
     RandomVectorX(x);
-    for (std::size_t j = 0; j < N; ++j) {
-        std::cout << x[j] << std::endl;
-    }
     // for (std::size_t i = 0; i < N; ++i) {
     //     std::cout << x[i] << " ";
     // }
     // std::cout << std::endl;
     // MPI_Barrier(MPI_COMM_WORLD);
-    AMultX(matrix, x, b);
-    for (std::size_t j = 0; j < N; ++j) {
-        std::cout << "b:" << b[j] << std::endl;
+    for (std::size_t i = 0; i < N; ++i) {
+        std::cout << x[i] << " ";
     }
+    std::cout << std::endl;
+    AMultX(matrix, x, b);
+    for (std::size_t i = 0; i < N; ++i) {
+        std::cout << b[i] << " ";
+    }
+    std::cout << std::endl;
     // MPI_Barrier(MPI_COMM_WORLD);
     SearchX(matrix, x, b);
     std::cout << "Hello from " << rank << std::endl;
+    if (rank == 0) {
+        endTime = MPI_Wtime();
+        std::cout << "Time: " << endTime - startTime << std::endl;
+    }
     MPI_Finalize();
     for (std::size_t i = 0; i < lrows; ++i) {
         delete[] matrix[i];
     }
     delete[] matrix;
+    delete[] x;
     return 0;
 }

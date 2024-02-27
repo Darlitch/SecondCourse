@@ -1,0 +1,7 @@
+
+prog:73550 terminated with signal 11 at PC=564d162d885d SP=7ffeae28ddd0.  Backtrace:
+./prog(+0x185d)[0x564d162d885d]
+./prog(+0x1c02)[0x564d162d8c02]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29d90)[0x7f11522c5d90]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80)[0x7f11522c5e40]
+./prog(+0x12a5)[0x564d162d82a5]
