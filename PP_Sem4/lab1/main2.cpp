@@ -8,7 +8,7 @@
 
 const std::size_t N = 5;
 const double e = 0.00001;
-const double t = 0.01;
+double t = 0.01;
 
 std::size_t FindLrows(int size, int rank) {
     return (N / size + (N % size > rank));
@@ -47,10 +47,8 @@ void RandomVectorX(double* x) {
     std::size_t begin = FindBegin(size, rank);
     std::size_t lrows = FindLrows(size, rank);
     srand(time(NULL));
-    for (std::size_t i = begin; i < begin + lrows; ++i) {
+    for (std::size_t i = 0; i < lrows; ++i) {
         x[i] = rand() % 10;
-        std::cout << "x: " << x[i] << std::endl;
-        // std::cout << "x: " << x[i] << std::endl;
     }
 }
 
@@ -62,49 +60,85 @@ int* FindLrowsV(int size) {
     return array;
 }
 
-void AMultX(double** matrix, double* x, double* b) {
+int* FindBeginV(int size) {
+    int* array = new int[size];
+    for (int j = 0; j < size; j++) {
+        array[j] = FindBegin(size, j);
+    }
+    return array;
+}
+
+void AMultX(double** matrix, double* xOld, double* b) {
     int size, rank;
-    // MPI_Barrier(MPI_COMM_WORLD);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     std::cout << "size: " << size << std::endl;
     std::size_t lrows = FindLrows(size, rank);
     std::size_t matrixBegin = FindBegin(size, rank);
+    double* x = new double[lrows];
     int* lrowsV = FindLrowsV(size);
+    int* beginV = FindBeginV(size);
+
+    std::copy_n(xOld, lrows, x);
 
     for (std::size_t p = 0; p < size; ++p) {       // полный подсчёт по всем процессам
         for (std::size_t i = 0; i < lrows; ++i) {  // проходимся по всем строкам матрицы
-            for (std::size_t j = matrixBegin; j < matrixBegin + lrows; ++j) {
-                b[i + matrixBegin] += x[i + matrixBegin] * matrix[i][j];
+            for (std::size_t j = 0; j < lrowsV[rank]; ++j) {
+                // std::cout << "rank: " << rank << " Begin: " << matrixBegin << std::endl;
+                // std::cout << "rank: " << rank << " " << b[i + matrixBegin] << " += " << x[j - matrixBegin] << " * " << matrix[i][j] << std::endl;
+                b[i] += x[j] * matrix[i][j + beginV[rank]];
             }
+            // std::cout << "rank: " << rank << " " << b[i + matrixBegin] << std::endl;
         }
+        // delete[] x1;
         double* x1 = new double[lrowsV[(rank + 1) % size]]();
         // std::cout << "1" << std::endl;
-        MPI_Sendrecv(x, lrows, MPI_DOUBLE, rank, 123, x1, lrowsV[(rank + 1) % size], MPI_DOUBLE, (rank + 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        MPI_Sendrecv(x, lrows, MPI_DOUBLE, (rank + 1) % size, 123, x1, lrowsV[(rank + 1) % size], MPI_DOUBLE, (rank + size - 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        // MPI_Sendrecv(x, lrows, MPI_DOUBLE, rank, 123, x1, lrowsV[(rank + 1) % size], MPI_DOUBLE, (rank + 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Sendrecv(x, lrowsV[rank], MPI_DOUBLE, (rank + 1) % size, 123, x1, lrowsV[(rank + 1) % size], MPI_DOUBLE, (rank + size - 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         std::swap(x, x1);
+        delete[] x1;
+        // for (std::size_t i = 0; i < lrowsV[(rank + 1) % size]; ++i) {
+        //     std::cout << " x1: " << x[i];
+        // }
+        // std::cout << " p: " << p << std::endl;
         // lrows = lrowsV[(rank + p + 1) % size - 1];
         std::rotate(lrowsV, lrowsV + 1, lrowsV + size);
-        // for (std::size_t i = 0; i < size; ++i) {
-        //     std::cout << "lrows: " << lrowsV[i] << std::endl;
-        // }
-        std::cout << "1" << std::endl;
-        delete[] x1;
+        std::rotate(beginV, beginV + 1, beginV + size);
+        // delete[] x1;
     }
     delete[] lrowsV;
 }
 
-void SubB(double* x1, double* b) {
+void Sub(double* x, double* b) {
+    int size, rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    std::size_t lrows = FindLrows(size, rank);
+    std::size_t matrixBegin = FindBegin(size, rank);
+
+    for (std::size_t i = 0; i < lrows; ++i) {
+        x[i] -= b[i];
+    }
 }
 
-void MultT(double* x1) {
+void MultT(double* x) {
+    int size, rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    std::size_t lrows = FindLrows(size, rank);
+
+    for (std::size_t i = 0; i < lrows; ++i) {
+        x[i] *= t;
+    }
 }
 
-void SubXX(double* x0, double* x1) {
+double Module(double* u) {
+    long double a = 0;
+    for (std::size_t i = 0; i < N; ++i) {
+        a += (u[i] * u[i]);
+    }
+    return sqrt(a);
 }
-
-// double Module(double* u) {
-// }
 
 void SearchX(double** matrix, double* x, double* b) {
     double x0[N];
@@ -120,13 +154,13 @@ void SearchX(double** matrix, double* x, double* b) {
 int main(int argc, char** argv) {
     double startTime, endTime;
     int rank, size;
-    double* x = new double[N]();
-    double b[N] = {0};
+    // double* x = new double[N]();
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     std::size_t lrows = FindLrows(size, rank);
-    // MPI_Barrier(MPI_COMM_WORLD);
+    double b[lrows] = {0};
+    double* x = new double[lrows]();
     double** matrix = MatrixBuilder(size, rank);
     if (rank == 0) {
         startTime = MPI_Wtime();
@@ -137,17 +171,16 @@ int main(int argc, char** argv) {
     //     std::cout << x[i] << " ";
     // }
     // std::cout << std::endl;
-    // MPI_Barrier(MPI_COMM_WORLD);
-    for (std::size_t i = 0; i < N; ++i) {
+    for (std::size_t i = 0; i < lrows; ++i) {
         std::cout << x[i] << " ";
     }
     std::cout << std::endl;
     AMultX(matrix, x, b);
-    for (std::size_t i = 0; i < N; ++i) {
+    std::cout << "b ";
+    for (std::size_t i = 0; i < lrows; ++i) {
         std::cout << b[i] << " ";
     }
     std::cout << std::endl;
-    // MPI_Barrier(MPI_COMM_WORLD);
     SearchX(matrix, x, b);
     std::cout << "Hello from " << rank << std::endl;
     if (rank == 0) {
@@ -159,6 +192,6 @@ int main(int argc, char** argv) {
         delete[] matrix[i];
     }
     delete[] matrix;
-    delete[] x;
+    // delete[] x;
     return 0;
 }

@@ -78,7 +78,7 @@ void AMultX(matrix_cont& matrix, double* x, double* b) {
     }
     for (std::size_t i = 0; i < lrows; ++i) {
         for (std::size_t j = matrixBegin; j < matrixBegin + lrows; ++j) {
-            b1[i] += x[i + matrixBegin] * matrix[i][j];
+            b1[i] += x[j] * matrix[i][j];
         }
     }
     // std::cout << "1" << std::endl;
