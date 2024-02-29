@@ -94,7 +94,7 @@ void AMultX(double** matrix, double* xOld, double* b) {
         // std::cout << "1" << std::endl;
         std::swap(x, x1);
         // MPI_Sendrecv(x, lrows, MPI_DOUBLE, rank, 123, x1, lrowsV[(rank + 1) % size], MPI_DOUBLE, (rank + 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        MPI_Sendrecv(x, lrowsV[rank], MPI_DOUBLE, (rank + 1) % size, 123, x1, lrowsV[(rank + 1) % size], MPI_DOUBLE, (rank + size - 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Sendrecv(x, lrowsV[rank], MPI_DOUBLE, (rank + size - 1) % size, 123, x1, lrowsV[(rank + 1) % size], MPI_DOUBLE, (rank + 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         std::swap(x, x1);
         // delete[] x1;
         // for (std::size_t i = 0; i < lrowsV[(rank + 1) % size]; ++i) {
@@ -124,8 +124,8 @@ void MultT(double* x, std::size_t lrows) {
 }
 
 double Module(double* u, std::size_t& lrows, int& rank, int& size) {
-    long double a = 0;
-    long double sum = 0;  // обязательно ли отдельную переменную?
+    double a = 0;
+    double sum = 0;  // обязательно ли отдельную переменную?
     for (std::size_t i = 0; i < lrows; ++i) {
         a += (u[i] * u[i]);
         // std::cout << "a:" << a << " " << std::endl;
@@ -187,7 +187,7 @@ void SearchX(double** matrix, double* x, double* b) {
         //     t = -t;
         // }
         // uOld = u;
-        // std::cout << "u:" << u << std::endl;
+        std::cout << "u:" << u << std::endl;
         // getchar();
         count++;
     } while (u > e);

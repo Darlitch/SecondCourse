@@ -9,7 +9,7 @@
 
 using matrix_cont = std::vector<std::vector<double>>;
 
-const std::size_t N = 2000;
+const std::size_t N = 300;
 const double e = 0.000001;
 
 std::size_t FindLrows(int size, int rank) {
@@ -113,7 +113,7 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
     double x1[N] = {0};
     double u = 0;
     double uOld = 0;
-    double t = 0.01;
+    double t = 0.001;
     int size, rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -147,11 +147,12 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
         // }
         // uOld = u;
         // std::cout << u << std::endl;
+        count++;
     } while (u > e);
     std::cout << "u: " << u << std::endl;
     if (rank == 0) {
-        for (std::size_t i = 0; i < 10; ++i) {
-            std::cout << x0[i] << " ";
+        for (std::size_t i = 0; i < N; ++i) {
+            std::cout << x0[i] - x[i] << " ";
         }
         std::cout << std::endl;
     }
@@ -173,7 +174,7 @@ int main(int argc, char** argv) {
     }
     MPI_Bcast(x, N, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     if (rank == 0) {
-        for (std::size_t i = 0; i < 10; ++i) {
+        for (std::size_t i = 0; i < N; ++i) {
             std::cout << x[i] << " ";
         }
         std::cout << std::endl;
