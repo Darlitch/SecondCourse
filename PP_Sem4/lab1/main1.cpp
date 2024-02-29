@@ -9,7 +9,7 @@
 
 using matrix_cont = std::vector<std::vector<double>>;
 
-const std::size_t N = 200;
+const std::size_t N = 2000;
 const double e = 0.000001;
 
 std::size_t FindLrows(int size, int rank) {
@@ -108,6 +108,7 @@ double Module(double* u) {
 }
 
 void SearchX(matrix_cont& matrix, double* x, double* b) {
+    std::size_t count = 0;
     double x0[N] = {0};
     double x1[N] = {0};
     double u = 0;
@@ -130,8 +131,8 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
         //     std::cout << x1[i] << " - ";
         // }
         // std::cout << std::endl;
-        if ((u - uOld) > 10) {
-            t = -t;
+        if (u > uOld && (count % 5 == 0)) {
+            t = (-t);
         }
         uOld = u;
         MultT(x1, t);
@@ -147,6 +148,7 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
         // uOld = u;
         // std::cout << u << std::endl;
     } while (u > e);
+    std::cout << "u: " << u << std::endl;
     if (rank == 0) {
         for (std::size_t i = 0; i < 10; ++i) {
             std::cout << x0[i] << " ";

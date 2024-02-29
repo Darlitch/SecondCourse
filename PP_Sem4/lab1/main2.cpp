@@ -7,7 +7,7 @@
 #include <iostream>
 
 const std::size_t N = 5;
-const double e = 0.00001;
+const double e = 0.000001;
 double t = 0.01;
 
 std::size_t FindLrows(int size, int rank) {
@@ -72,7 +72,6 @@ void AMultX(double** matrix, double* xOld, double* b) {
     int size, rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    std::cout << "size: " << size << std::endl;
     std::size_t lrows = FindLrows(size, rank);
     std::size_t matrixBegin = FindBegin(size, rank);
     double* x = new double[lrows];
@@ -93,10 +92,11 @@ void AMultX(double** matrix, double* xOld, double* b) {
         // delete[] x1;
         double* x1 = new double[lrowsV[(rank + 1) % size]]();
         // std::cout << "1" << std::endl;
+        std::swap(x, x1);
         // MPI_Sendrecv(x, lrows, MPI_DOUBLE, rank, 123, x1, lrowsV[(rank + 1) % size], MPI_DOUBLE, (rank + 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         MPI_Sendrecv(x, lrowsV[rank], MPI_DOUBLE, (rank + 1) % size, 123, x1, lrowsV[(rank + 1) % size], MPI_DOUBLE, (rank + size - 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         std::swap(x, x1);
-        delete[] x1;
+        // delete[] x1;
         // for (std::size_t i = 0; i < lrowsV[(rank + 1) % size]; ++i) {
         //     std::cout << " x1: " << x[i];
         // }
@@ -109,46 +109,96 @@ void AMultX(double** matrix, double* xOld, double* b) {
     delete[] lrowsV;
 }
 
-void Sub(double* x, double* b) {
-    int size, rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-    std::size_t lrows = FindLrows(size, rank);
-    std::size_t matrixBegin = FindBegin(size, rank);
-
+void Sub(double* x, double* b, std::size_t lrows) {
     for (std::size_t i = 0; i < lrows; ++i) {
         x[i] -= b[i];
     }
 }
 
-void MultT(double* x) {
-    int size, rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-    std::size_t lrows = FindLrows(size, rank);
-
+void MultT(double* x, std::size_t lrows) {
     for (std::size_t i = 0; i < lrows; ++i) {
+        // std::cout << "x1:" << x[i] << " " << std::endl;
         x[i] *= t;
+        // std::cout << "xt:" << x[i] << " " << std::endl;
     }
 }
 
-double Module(double* u) {
+double Module(double* u, std::size_t& lrows, int& rank, int& size) {
     long double a = 0;
-    for (std::size_t i = 0; i < N; ++i) {
+    long double sum = 0;  // обязательно ли отдельную переменную?
+    for (std::size_t i = 0; i < lrows; ++i) {
         a += (u[i] * u[i]);
+        // std::cout << "a:" << a << " " << std::endl;
     }
-    return sqrt(a);
+    if (size == 1) {
+        return sqrt(a);
+    }
+    MPI_Allreduce(&a, &sum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    return sqrt(sum);
 }
 
 void SearchX(double** matrix, double* x, double* b) {
-    double x0[N];
-    double x1[N];
-    double u;
+    std::size_t count = 0;
+    double xFinal[N] = {0};
+    double u = 0;
+    double uOld = 0;
     int size, rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     std::size_t lrows = FindLrows(size, rank);
     std::size_t matrixBegin = FindBegin(size, rank);
+    int* lrowsV = FindLrowsV(size);
+    int* beginV = FindBeginV(size);
+    double x0[lrows] = {0};
+    double x1[lrows] = {0};
+
+    // for (std::size_t i = 0; i < lrows; ++i) {
+    //     std::cout << x1[i] << " ";
+    // }
+    // std::cout << std::endl;
+    AMultX(matrix, x0, x1);
+    Sub(x1, b, lrows);
+    // for (std::size_t i = 0; i < lrows; ++i) {
+    //     std::cout << x1[i] << " ";
+    // }
+    // std::cout << std::endl;
+    do {
+        // std::cout << "Hello from " << rank << std::endl;
+        // for (std::size_t i = 0; i < N; ++i) {
+        //     std::cout << x[i] << " ";
+        // }
+        // std::cout << std::endl;
+        // for (std::size_t i = 0; i < N; ++i) {
+        //     std::cout << x1[i] << " - ";
+        // }
+        // std::cout << std::endl;
+        if (u > uOld && (count % 5 == 0)) {
+            t = (-t);
+        }
+        uOld = u;
+        MultT(x1, lrows);
+        Sub(x0, x1, lrows);
+        AMultX(matrix, x0, x1);
+        Sub(x1, b, lrows);
+        u = Module(x1, lrows, rank, size);
+        // std::cout << u << std::endl;
+        u = u / Module(b, lrows, rank, size);
+        // if ((u - uOld) > 10) {
+        //     t = -t;
+        // }
+        // uOld = u;
+        // std::cout << "u:" << u << std::endl;
+        // getchar();
+        count++;
+    } while (u > e);
+    MPI_Gatherv(x0, lrows, MPI_DOUBLE, xFinal, lrowsV, beginV, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    if (rank == 0) {
+        for (std::size_t i = 0; i < N; ++i) {
+            std::cout << xFinal[i] << " ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << rank << " Vector found" << std::endl;
 }
 
 int main(int argc, char** argv) {
