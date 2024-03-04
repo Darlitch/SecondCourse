@@ -9,7 +9,7 @@
 
 using matrix_cont = std::vector<std::vector<double>>;
 
-const std::size_t N = 3000;
+const std::size_t N = 1300;
 const double e = 0.000001;
 
 std::size_t FindLrows(int size, int rank) {
@@ -98,7 +98,7 @@ void MultT(double* x1, double t) {
 }
 
 double Module(double* u) {
-    long double a = 0;
+    double a = 0;
     for (std::size_t i = 0; i < N; ++i) {
         a += (u[i] * u[i]);
     }
