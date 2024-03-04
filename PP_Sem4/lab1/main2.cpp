@@ -6,9 +6,9 @@
 #include <ctime>
 #include <iostream>
 
-const std::size_t N = 5;
+const std::size_t N = 100;
 const double e = 0.000001;
-double t = 0.01;
+double t = 0.001;
 
 std::size_t FindLrows(int size, int rank) {
     return (N / size + (N % size > rank));
@@ -187,17 +187,21 @@ void SearchX(double** matrix, double* x, double* b) {
         //     t = -t;
         // }
         // uOld = u;
-        std::cout << "u:" << u << std::endl;
+        // std::cout << "u:" << u << std::endl;
         // getchar();
         count++;
     } while (u > e);
+    std::cout << "u:" << u << std::endl;
     MPI_Gatherv(x0, lrows, MPI_DOUBLE, xFinal, lrowsV, beginV, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    if (rank == 0) {
-        for (std::size_t i = 0; i < N; ++i) {
-            std::cout << xFinal[i] << " ";
-        }
-        std::cout << std::endl;
-    }
+    // if (rank == 0) {
+    //     for (std::size_t i = 0; i < N; ++i) {
+    //         std::cout << xFinal[i] << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
+    Sub(x0, x, lrows);
+    u = Module(x0, lrows, rank, size);
+    std::cout << "NormalX: " << u << std::endl;
     std::cout << rank << " Vector found" << std::endl;
 }
 

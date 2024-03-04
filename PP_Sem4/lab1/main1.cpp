@@ -9,7 +9,7 @@
 
 using matrix_cont = std::vector<std::vector<double>>;
 
-const std::size_t N = 300;
+const std::size_t N = 3000;
 const double e = 0.000001;
 
 std::size_t FindLrows(int size, int rank) {
@@ -72,16 +72,14 @@ void AMultX(matrix_cont& matrix, double* x, double* b) {
     int* lrowsV = FindLrowsV(size);
     int* beginV = FindBeginV(size);
     double b1[lrows];
-    // std::cout << "lrows: " << lrows << std::endl;
     for (std::size_t i = 0; i < lrows; ++i) {
-        b1[i] = b[i + matrixBegin];  // А ТУТ НЕ ДОЛЖНО БЫТЬ РАВНО 0???
+        b1[i] = b[i + matrixBegin];  
     }
     for (std::size_t i = 0; i < lrows; ++i) {
         for (std::size_t j = matrixBegin; j < matrixBegin + lrows; ++j) {
             b1[i] += x[j] * matrix[i][j];
         }
     }
-    // std::cout << "1" << std::endl;
     MPI_Allgatherv(b1, lrows, MPI_DOUBLE, b, lrowsV, beginV, MPI_DOUBLE, MPI_COMM_WORLD);
     delete[] lrowsV;
     delete[] beginV;
@@ -122,15 +120,6 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
     AMultX(matrix, x0, x1);
     Sub(x1, b);
     do {
-        // std::cout << "Hello from " << rank << std::endl;
-        // for (std::size_t i = 0; i < N; ++i) {
-        //     std::cout << x[i] << " ";
-        // }
-        // std::cout << std::endl;
-        // for (std::size_t i = 0; i < N; ++i) {
-        //     std::cout << x1[i] << " - ";
-        // }
-        // std::cout << std::endl;
         if (u > uOld && (count % 5 == 0)) {
             t = (-t);
         }
@@ -140,22 +129,13 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
         AMultX(matrix, x0, x1);
         Sub(x1, b);
         u = Module(x1);
-        // std::cout << u << std::endl;
         u = u / Module(b);
-        // if ((u - uOld) > 10) {
-        //     t = -t;
-        // }
-        // uOld = u;
-        // std::cout << u << std::endl;
         count++;
     } while (u > e);
-    std::cout << "u: " << u << std::endl;
-    if (rank == 0) {
-        for (std::size_t i = 0; i < N; ++i) {
-            std::cout << x0[i] - x[i] << " ";
-        }
-        std::cout << std::endl;
-    }
+    std::cout << "u:" << u << std::endl;
+    Sub(x0, x);
+    u = Module(x0);
+    std::cout << "NormalX: " << u << std::endl;
     std::cout << rank << " Vector found" << std::endl;
 }
 
@@ -173,12 +153,6 @@ int main(int argc, char** argv) {
         RandomVectorX(x);
     }
     MPI_Bcast(x, N, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    if (rank == 0) {
-        for (std::size_t i = 0; i < N; ++i) {
-            std::cout << x[i] << " ";
-        }
-        std::cout << std::endl;
-    }
     AMultX(matrix, x, b);
     SearchX(matrix, x, b);
     if (rank == 0) {
