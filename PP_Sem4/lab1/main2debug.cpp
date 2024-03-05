@@ -92,15 +92,25 @@ void AMultX(double** matrix, double* xOld, double* b) {
         }
         // delete[] x1;
 
-        double* x1 = new double[lrowsV[(rank + size - 1) % size]]();
-
+        double* x1 = new double[lrowsV[(rank + 1) % size]]();
+        if (rank == 0)
+            std::cout << "::::" << p << "XSize: " << lrowsV[(rank+1) % size] << std::endl;
         // std::cout << "1" << std::endl;
         // MPI_Sendrecv(x, lrows, MPI_DOUBLE, rank, 123, x1, lrowsV[(rank + 1) % size], MPI_DOUBLE, (rank + 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-        // std::swap(x, x1);
+        // std::cout << p << ":" << rank << ":";
+        // for (std::size_t i = 0; i < lrowsV[rank]; ++i) {
+        //     std::cout << " x: " << x[i];
+        // }
+        // std::cout << std::endl;
+        // // std::swap(x, x1);
         MPI_Sendrecv(x, lrowsV[rank], MPI_DOUBLE, (rank + size - 1) % size, 123, x1, lrowsV[(rank + 1) % size], MPI_DOUBLE, (rank + 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        // MPI_Sendrecv(x, lrowsV[rank], MPI_DOUBLE, (rank + 1) % size, 123, x1, lrowsV[(rank + 1) % size], MPI_DOUBLE, (rank + size - 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         // MPI_Sendrecv(x, lrowsV[rank], MPI_DOUBLE, (rank + size - 1) % size, 123, x1, lrowsV[(rank + size - 1) % size], MPI_DOUBLE, (rank + 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         std::swap(x, x1);
+        // for (std::size_t i = 0; i < lrowsV[(rank + 1) % size]; ++i) {
+        //     std::cout << " x1: " << x[i];
+        // }
+        // std::cout << std::endl;
 
         // MPI_Sendrecv_replace(x, lrowsV[rank], MPI_DOUBLE, (rank + size - 1) % size, 123, (rank + 1) % size, 123, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
@@ -110,9 +120,21 @@ void AMultX(double** matrix, double* xOld, double* b) {
         // }
         // std::cout << " p: " << p << std::endl;
         // lrows = lrowsV[(rank + p + 1) % size - 1];
-        std::rotate(lrowsV, lrowsV + size - 1, lrowsV + size);
-        std::rotate(beginV, beginV + size - 1, beginV + size);
+        // if (rank == 0) {
+        //     for (std::size_t i = 0; i < size; ++i) {
+        //         std::cout << "::::" << p << "lrows: " << lrowsV[i];
+        //     }
+        //     std::cout << std::endl;
+        // }
+        std::rotate(lrowsV, lrowsV + 1, lrowsV + size);
+        std::rotate(beginV, beginV + 1, beginV + size);
         // delete[] x1;
+        // if (rank == 0) {
+        //     for (std::size_t i = 0; i < size; ++i) {
+        //         std::cout << "::::" << p << "lrows: " << lrowsV[i];
+        //     }
+        //     std::cout << std::endl;
+        // }
     }
     delete[] lrowsV;
     delete[] beginV;

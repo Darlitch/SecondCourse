@@ -6,7 +6,7 @@
 #include <ctime>
 #include <iostream>
 
-const std::size_t N = 20;
+const std::size_t N = 1300;
 const double e = 0.000001;
 double t = 0.001;
 
@@ -110,8 +110,8 @@ void AMultX(double** matrix, double* xOld, double* b) {
         // }
         // std::cout << " p: " << p << std::endl;
         // lrows = lrowsV[(rank + p + 1) % size - 1];
-        std::rotate(lrowsV, lrowsV + size - 1, lrowsV + size);
-        std::rotate(beginV, beginV + size - 1, beginV + size);
+        std::rotate(lrowsV, lrowsV + 1, lrowsV + size);
+        std::rotate(beginV, beginV + 1, beginV + size);
         // delete[] x1;
     }
     delete[] lrowsV;
