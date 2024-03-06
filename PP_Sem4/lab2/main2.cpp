@@ -15,7 +15,7 @@ double t = 0.001;
 
 matrix_cont MatrixBuilder() {
     matrix_cont matrix(N, std::vector<double>(N));
-#pragma omp parallel for
+#pragma omp for
     for (std::size_t i = 0; i < N; ++i) {
         for (std::size_t j = 0; j < N; ++j) {
             if (j == i) {
@@ -30,40 +30,61 @@ matrix_cont MatrixBuilder() {
 
 void RandomVectorX(double* x) {
     srand(time(NULL));
-#pragma omp parallel for
+#pragma omp for
     for (std::size_t i = 0; i < N; ++i) {
-        x[i] = rand() % 10;
+        // x[i] = rand() % 10;
+#pragma omp critical //??
+        {
+            x[i] = rand() % 10;
+        }
     }
 }
 
 void AMultX(matrix_cont& matrix, double* x, double* b) {
-#pragma omp parallel for
+#pragma omp for
     for (std::size_t i = 0; i < N; ++i) {
         for (std::size_t j = 0; j < N; ++j) {
-            b[i] += x[j] * matrix[i][j];
+            double temp = x[j] * matrix[i][j];
+#pragma omp critical
+            {
+                b[i] += temp;
+            }
         }
     }
 }
 
 void Sub(double* x1, double* b) {
-#pragma omp parallel for
+#pragma omp for
     for (std::size_t i = 0; i < N; ++i) {
-        x1[i] -= b[i];
+        // x1[i] -= b[i];
+#pragma omp critical
+        {
+            x1[i] -= b[i];
+        }
     }
 }
 
 void MultT(double* x1) {
-#pragma omp parallel for
+#pragma omp for
     for (std::size_t i = 0; i < N; ++i) {
-        x1[i] *= t;
+        // x1[i] *= t;
+#pragma omp critical
+        {
+            x1[i] *= t;
+        }
     }
 }
 
 double Module(double* u) {
     double a = 0;
-#pragma omp parallel for reduction(+:a)
+#pragma omp for reduction(+ : a)
     for (std::size_t i = 0; i < N; ++i) {
+        double temp = u[i] * u[i];
         a += (u[i] * u[i]);
+#pragma omp critical
+        {
+            a += temp;
+        }
     }
     return sqrt(a);
 }
