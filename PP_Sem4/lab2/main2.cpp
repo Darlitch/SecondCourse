@@ -81,7 +81,11 @@ double Module(double* u, double& sum) {
         // }
     }
 #pragma omp master
+    std::cout << sum << std::endl;
+#pragma omp master
     sum = sqrt(sum);
+#pragma omp master
+    std::cout << sum << std::endl;
     return sum;  // TODO
 }
 
@@ -93,11 +97,17 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
     double u2 = 0;
     double uOld = 0;
     double sum = 0;
+    double sum2 = 0;
+    // #pragma omp parallel
+    //     {
+    AMultX(matrix, x0, x1);
+    Sub(x1, b);
+    Module(b, sum);
+    u2 = sum;
+    sum = 0;
+    do {
 #pragma omp parallel
-    {
-        AMultX(matrix, x0, x1);
-        Sub(x1, b);
-        do {
+        {
             if (u > uOld && (count % 5 == 0)) {
 #pragma omp master
                 t = (-t);
@@ -107,21 +117,34 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
             Sub(x0, x1);
             AMultX(matrix, x0, x1);
             Sub(x1, b);
-            // #pragma omp master
-            u = Module(x1, sum);
-            sum = 0;
-            u2 = Module(b, sum);
+            Module(x1, sum);
 #pragma omp master
-            u = u / u2;
-            sum = 0;
+            u = sum;
 #pragma omp master
-            count++;
-        } while (u > e);
-        std::cout << "u:" << u << std::endl;
+            std::cout << "u1:" << u << std::endl;
+            // getchar();
+// #pragma omp master
+//             sum = 0;
+//             Module(b, sum);
+// #pragma omp master
+//             u2 = sum;
+// #pragma omp master
+//             std::cout << "u2:" << u2 << std::endl;
+//             getchar();
+#pragma omp master
+        u = u / u2;
+        }
+        sum = 0;
+#pragma omp master
+        count++;
+#pragma omp barrier
+    } while (u > e);
+    // std::cout << "u:" << u << std::endl;
 
-        Sub(x0, x);
-        u = Module(x0, sum);
-    }
+    Sub(x0, x);
+    Module(x0, sum);
+    u = sum;
+    // }
     std::cout << "NormalX: " << u << std::endl;
 }
 
