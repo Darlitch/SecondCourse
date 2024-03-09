@@ -9,7 +9,7 @@
 
 using matrix_cont = std::vector<std::vector<double>>;
 
-const std::size_t N = 800;
+const std::size_t N = 1200;
 const double e = 0.000001;
 double t = 0.001;
 
@@ -61,7 +61,7 @@ void MultT(double* x1) {
 
 double Module(double* u) {
     double a = 0;
-#pragma omp parallel for reduction(+:a)
+#pragma omp parallel for reduction(+ : a)
     for (std::size_t i = 0; i < N; ++i) {
         a += (u[i] * u[i]);
     }
@@ -74,9 +74,11 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
     double x1[N] = {0};
     double u = 0;
     double uOld = 0;
+    double bNorm = 0;
 
     AMultX(matrix, x0, x1);
     Sub(x1, b);
+    bNorm = Module(b);
     do {
         if (u > uOld && (count % 5 == 0)) {
             t = (-t);
@@ -87,7 +89,7 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
         AMultX(matrix, x0, x1);
         Sub(x1, b);
         u = Module(x1);
-        u = u / Module(b);
+        u = u / bNorm;
         count++;
     } while (u > e);
     std::cout << "u:" << u << std::endl;
