@@ -73,7 +73,7 @@ void AMultX(matrix_cont& matrix, double* x, double* b) {
     int* beginV = FindBeginV(size);
     double b1[lrows];
     for (std::size_t i = 0; i < lrows; ++i) {
-        b1[i] = b[i + matrixBegin];  
+        b1[i] = b[i + matrixBegin];
     }
     for (std::size_t i = 0; i < lrows; ++i) {
         for (std::size_t j = matrixBegin; j < matrixBegin + lrows; ++j) {
@@ -110,15 +110,15 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
     double x0[N] = {0};
     double x1[N] = {0};
     double u = 0;
+    double bNorm = 0;
     double uOld = 0;
     double t = 0.001;
     int size, rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    // std::size_t lrows = FindLrows(size, rank);
-    // std::size_t matrixBegin = FindBegin(size, rank);
     AMultX(matrix, x0, x1);
     Sub(x1, b);
+    bNorm = Module(b);
     do {
         if (u > uOld && (count % 5 == 0)) {
             t = (-t);
@@ -129,14 +129,15 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
         AMultX(matrix, x0, x1);
         Sub(x1, b);
         u = Module(x1);
-        u = u / Module(b);
+        u = u / bNorm;
         count++;
     } while (u > e);
-    std::cout << "u:" << u << std::endl;
     Sub(x0, x);
-    u = Module(x0);
-    std::cout << "NormalX: " << u << std::endl;
-    std::cout << rank << " Vector found" << std::endl;
+    if (rank == 0) {
+        std::cout << "u:" << u << std::endl;
+        std::cout << "NormalX: " << Module(x0) << std::endl;
+        std::cout << rank << " Vector found" << std::endl;
+    }
 }
 
 int main(int argc, char** argv) {

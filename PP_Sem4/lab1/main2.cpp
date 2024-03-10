@@ -44,7 +44,6 @@ void RandomVectorX(double* x) {
     int size, rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    // std::size_t begin = FindBegin(size, rank);
     std::size_t lrows = FindLrows(size, rank);
     srand(time(NULL));
     for (std::size_t i = 0; i < lrows; ++i) {
@@ -73,14 +72,13 @@ void AMultX(double** matrix, double* xOld, double* b) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     std::size_t lrows = FindLrows(size, rank);
-    // std::size_t matrixBegin = FindBegin(size, rank);
     double* x = new double[lrows];
     int* lrowsV = FindLrowsV(size);
     int* beginV = FindBeginV(size);
 
     std::copy_n(xOld, lrows, x);
 
-    for (int p = 0; p < size; ++p) {       // полный подсчёт по всем процессам
+    for (int p = 0; p < size; ++p) {               // полный подсчёт по всем процессам
         for (std::size_t i = 0; i < lrows; ++i) {  // проходимся по всем строкам матрицы
             for (int j = 0; j < lrowsV[rank]; ++j) {
                 b[i] += x[j] * matrix[i][j + beginV[rank]];
@@ -113,7 +111,7 @@ void MultT(double* x, std::size_t lrows) {
 
 double Module(double* u, std::size_t& lrows, int& size) {
     double a = 0;
-    double sum = 0;  // обязательно ли отдельную переменную?
+    double sum = 0;
     for (std::size_t i = 0; i < lrows; ++i) {
         a += (u[i] * u[i]);
     }
@@ -127,17 +125,15 @@ double Module(double* u, std::size_t& lrows, int& size) {
 void SearchX(double** matrix, double* x, double* b) {
     std::size_t count = 0;
     double u = 0;
+    double bNorm = 0;
     double uOld = 0;
     int size, rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     std::size_t lrows = FindLrows(size, rank);
-    // std::size_t matrixBegin = FindBegin(size, rank);
-    // int* lrowsV = FindLrowsV(size);
-    // int* beginV = FindBeginV(size);
     double* x0 = new double[lrows]();
     double* x1 = new double[lrows]();
-    
+    bNorm = Module(b, lrows, size);
     AMultX(matrix, x0, x1);
     Sub(x1, b, lrows);
     do {
@@ -150,15 +146,16 @@ void SearchX(double** matrix, double* x, double* b) {
         AMultX(matrix, x0, x1);
         Sub(x1, b, lrows);
         u = Module(x1, lrows, size);
-        u = u / Module(b, lrows, size);
+        u = u / bNorm;
         count++;
     } while (u > e);
-    std::cout << "u:" << u << std::endl;
-
     Sub(x0, x, lrows);
-    u = Module(x0, lrows, size);
-    std::cout << "NormalX: " << u << std::endl;
-    std::cout << rank << " Vector found" << std::endl;
+    bNorm = Module(x0, lrows, size);
+    if (rank == 0) {
+        std::cout << "u:" << u << std::endl;
+        std::cout << "NormalX: " << bNorm << std::endl;
+        std::cout << rank << " Vector found" << std::endl;
+    }
 }
 
 int main(int argc, char** argv) {
