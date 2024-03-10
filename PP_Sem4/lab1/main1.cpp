@@ -13,13 +13,13 @@ const std::size_t N = 1300;
 const double e = 0.000001;
 
 std::size_t FindLrows(int size, int rank) {
-    return (N / size + (N % size > rank));
+    return (N / size + ((int)(N % size) > rank));
 }
 
 std::size_t FindBegin(int size, int rank) {
     std::size_t begin = 0;
-    for (std::size_t i = 0; i < rank; ++i) {
-        begin += (N / size) + (N % size > i);
+    for (int i = 0; i < rank; ++i) {
+        begin += (N / size) + ((int)(N % size) > i);
     }
     return begin;
 }
@@ -50,7 +50,7 @@ void RandomVectorX(double* x) {
 int* FindLrowsV(int size) {
     int* array = new int[size];
     for (int j = 0; j < size; ++j) {
-        array[j] = (N / size) + (int)(N % size > j);
+        array[j] = (N / size) + (int)((int)(N % size) > j);
     }
     return array;
 }
@@ -115,8 +115,8 @@ void SearchX(matrix_cont& matrix, double* x, double* b) {
     int size, rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    std::size_t lrows = FindLrows(size, rank);
-    std::size_t matrixBegin = FindBegin(size, rank);
+    // std::size_t lrows = FindLrows(size, rank);
+    // std::size_t matrixBegin = FindBegin(size, rank);
     AMultX(matrix, x0, x1);
     Sub(x1, b);
     do {
