@@ -9,7 +9,7 @@ static ssize_t mywrite(int fd, const void *buf, size_t count) {
 
 int main() {
     // printf("Hello world");
-    ssize_t err = write(1, "Hello world!\n", 13);
+    ssize_t err = mywrite(1, "Hello world!\n", 13);
     if (err == -1 || err == NULL) {
         return 1;
     }
