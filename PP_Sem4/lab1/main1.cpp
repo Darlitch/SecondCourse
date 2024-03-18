@@ -9,7 +9,7 @@
 
 using matrix_cont = std::vector<std::vector<double>>;
 
-const std::size_t N = 1300;
+const std::size_t N = 400;
 const double e = 0.000001;
 
 std::size_t FindLrows(int size, int rank) {

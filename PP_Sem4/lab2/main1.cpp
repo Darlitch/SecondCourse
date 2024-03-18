@@ -9,7 +9,7 @@
 
 using matrix_cont = std::vector<std::vector<double>>;
 
-const std::size_t N = 1200;
+const std::size_t N = 600;
 const double e = 0.000001;
 double t = 0.001;
 
