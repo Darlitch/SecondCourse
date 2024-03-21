@@ -6,9 +6,9 @@
 #include <ctime>
 #include <iostream>
 
-const std::size_t N = 1300;
+const std::size_t N = 1500;
 const double e = 0.000001;
-double t = 0.001;
+double t = 0.0001;
 
 std::size_t FindLrows(int size, int rank) {
     return (N / size + ((int)(N % size) > rank));
@@ -47,7 +47,8 @@ void RandomVectorX(double* x) {
     std::size_t lrows = FindLrows(size, rank);
     srand(time(NULL));
     for (std::size_t i = 0; i < lrows; ++i) {
-        x[i] = rand() % 10;
+        x[i] = ((double)rand()/RAND_MAX);
+        // std::cout << x[i] << " ";
     }
 }
 
@@ -148,6 +149,7 @@ void SearchX(double** matrix, double* x, double* b) {
         u = Module(x1, lrows, size);
         u = u / bNorm;
         count++;
+        // std::cout << "u:" << u << std::endl;
     } while (u > e);
     Sub(x0, x, lrows);
     bNorm = Module(x0, lrows, size);
@@ -174,6 +176,10 @@ int main(int argc, char** argv) {
     }
     RandomVectorX(x);
     AMultX(matrix, x, b);
+    // for (std::size_t i = 0; i < lrows; ++i) {
+    //     std::cout << b[i] << ' ';
+    // }
+    // std::cout << std::endl;
     SearchX(matrix, x, b);
     if (rank == 0) {
         endTime = MPI_Wtime();
