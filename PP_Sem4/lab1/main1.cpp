@@ -9,7 +9,7 @@
 
 using matrix_cont = std::vector<std::vector<double>>;
 
-const std::size_t N = 1500;
+const std::size_t N = 600;
 const double e = 0.000001;
 
 std::size_t FindLrows(int size, int rank) {
@@ -43,7 +43,7 @@ matrix_cont MatrixBuilder(int size, int rank) {
 void RandomVectorX(double* x) {
     srand(time(NULL));
     for (std::size_t i = 0; i < N; ++i) {
-        x[i] = ((double)rand()/RAND_MAX);
+        x[i] = ((double)rand() / RAND_MAX);
         // std::cout << x[i] << " ";
     }
 }
@@ -77,7 +77,7 @@ void AMultX(matrix_cont& matrix, double* x, double* b) {
         b1[i] = b[i + matrixBegin];
     }
     for (std::size_t i = 0; i < lrows; ++i) {
-        for (std::size_t j = matrixBegin; j < matrixBegin + lrows; ++j) {
+        for (std::size_t j = 0; j < N; ++j) {
             b1[i] += x[j] * matrix[i][j];
         }
     }
