@@ -3,7 +3,6 @@
 #include "stdio.h"
 #include "errno.h"
 #include "string.h"
-// #include "sys/types.h"
 #include "sys/stat.h"
 #include "dirent.h"
 #include "fcntl.h"
@@ -28,13 +27,6 @@ char* FindDirName(char* str, size_t* count) {
     }
     return dirName;
 }
-
-// void PrintError() {
-//     size_t error_len = strerrorlen_s(errno) + 1;
-//     char error_buf[error_len];
-//     strerror_s(error_buf, error_len, errno);
-//     fprintf(stderr, "Error message : %s\n", error_buf);
-// }
 
 char* TakeFileName(char* dirName, char* fileN, size_t lenDir) {
     char* fileName;
@@ -122,6 +114,7 @@ void WorkWithFiles(char* dirName, char* dirNameReverse) {
                 ReverseFileName(entry->d_name);
                 char* newFileName = TakeFileName(dirNameReverse, entry->d_name,lenDirReverse);
                 CopyFile(fullFileName, newFileName);
+                free(newFileName);
             }
             free(fullFileName);
         }
@@ -143,15 +136,9 @@ int main(int argc, char** argv) {
         }
         WorkWithFiles(argv[1], dirName);
     } else {
-        // printf("ERROR: %s\n", strerror(errno));
-        // PrintError();
         fprintf(stderr, "ERROR: The directory does not exist!\n");
         exit(-1);
     }
-    // printf("%zu\n", dirSize);
-    // for (size_t i = 0; i < dirSize; ++i) {
-    //     printf("%c", dirName[i]);
-    // }
     free(dirName);
     return 0;
 }
