@@ -137,6 +137,44 @@ void Cat(const char* fileName) {
     putchar('\n');
 }
 
+char* TakeLinkName(const char* symName, const char* fileN, size_t lenLink) {
+    char* fileName;
+    const size_t lenFile = strlen(fileN);
+    fileName = malloc(lenLink + lenFile + 1);
+    memcpy(fileName, symName, lenLink);
+    memcpy(fileName + lenLink, fileN, lenFile + 1);
+    return fileName;
+}
+
+void CreateSymLink(const char* fileName) {
+    char* linkName = TakeLinkName("symLink", fileName, 7);
+    if (symlink(fileName, linkName) != 0) {
+        fprintf(stderr, "ERROR Cat: can`t create sym link");
+        exit(-7);
+    }
+}
+
+void CatSymLink(const char* fileName) {
+    struct stat st = {0};
+    char* linkName;
+    if (stat(fileName, &st) == -1) {
+        fprintf(stderr, "ERROR CatSymLink: stat");
+        exit(-8);
+    }
+    linkName = malloc(st.st_size + 2);
+    if (linkName == NULL) {
+        fprintf(stderr, "ERROR CatSymLink: not enough memory");
+        exit(-8);
+    }
+    if (readlink(fileName, linkName, st.st_size + 1) == -1) {
+        fprintf(stderr, "ERROR CatSymLink: the link could not be read");
+        exit(-8);
+    }
+    printf("%s\n", linkName);
+}
+
+
+
 void Menu(const char* fileName) {
     size_t menu = 100;
     while(menu != 0) {
@@ -156,11 +194,25 @@ void Menu(const char* fileName) {
             break;
         case 4:
             CreateFile(fileName);
+            break;
         case 5:
             Cat(fileName);
             break;
         case 6:
             DeleteFile(fileName);
+            break;
+        case 7:
+            CreateSymLink(fileName);
+            break;
+        case 8:
+            CatSymLink(fileName);
+            break;
+        case 9:
+            Cat(fileName);
+            break;
+        case 10:
+            DeleteFile(fileName);
+            break;
         default:
             break;
         }
