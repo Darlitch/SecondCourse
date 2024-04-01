@@ -157,11 +157,11 @@ void CreateSymLink(const char* fileName) {
 void CatSymLink(const char* fileName) {
     struct stat st = {0};
     char* linkName;
-    if (stat(fileName, &st) == -1) {
+    if (lstat(fileName, &st) == -1) {
         fprintf(stderr, "ERROR CatSymLink: stat");
         exit(-8);
     }
-    linkName = malloc(st.st_size + 2);
+    linkName = malloc(st.st_size + 1);
     if (linkName == NULL) {
         fprintf(stderr, "ERROR CatSymLink: not enough memory");
         exit(-8);
@@ -173,7 +173,30 @@ void CatSymLink(const char* fileName) {
     printf("%s\n", linkName);
 }
 
+void CreateLink(const char* fileName) {
+    char* linkName = TakeLinkName("Link", fileName, 4);
+    if (link(fileName, linkName) != 0) {
+        fprintf(stderr, "ERROR Cat: can`t create sym link");
+        exit(-7);
+    }
+}
 
+void ShowPermissions(const char* fileName) {
+    struct stat st = {0};
+    if (stat(fileName, &st) == -1) {
+        fprintf(stderr, "ERROR ShowPermissions: stat");
+        exit(-13);
+    }
+    printf("mode: %o\n", st.st_mode & 07777);
+    printf("links: %lu\n", st.st_nlink);
+}
+
+void ChangePermissions(const char* fileName) {
+    if (chmod(fileName, S_IRWXU | S_IRWXG | S_IRWXO) == -1) {
+        fprintf(stderr, "ERROR ChangePermissions: the permissions could not be change");
+        exit(-14);
+    }
+}
 
 void Menu(const char* fileName) {
     size_t menu = 100;
@@ -213,6 +236,17 @@ void Menu(const char* fileName) {
         case 10:
             DeleteFile(fileName);
             break;
+        case 11:
+            CreateLink(fileName);
+            break;
+        case 12:
+            DeleteFile(fileName);
+            break;
+        case 13:
+            ShowPermissions(fileName);
+            break;
+        case 14:
+            ChangePermissions(fileName);
         default:
             break;
         }
