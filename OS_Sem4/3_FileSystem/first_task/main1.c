@@ -127,7 +127,6 @@ void WorkWithFiles(char* dirName, char* dirNameReverse) {
 int main(int argc, char** argv) {
     size_t dirSize = 0;
     struct stat st  = {0};
-    errno = 0;
     char* dirName = FindDirName(argv[1], &dirSize);
     if (stat(argv[1], &st) == 0 && S_ISREG(st.st_mode) == 0) {
         if (mkdir(dirName, 0755) == -1) {
