@@ -1,6 +1,7 @@
 //  из исо во внутренню, из внутренней в исо, и прибавить знаковые секунды
 public class TimePoint {
     private static long dateInSec;
+    private static final int[] dayInM = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 //    private static int year;
 //    private static int month;
 //    private static int day;
@@ -36,25 +37,62 @@ public class TimePoint {
         dateInSec += seconds;
     }
 
-//    public String to_str() {
-//        String a = String.format("%04d-%02d-%02dT%02d:%02d:%02d", year, month, day, h, min, sec);
-//        return a;
-//    }
+    private int FindMounth(int days, int year) {
+        int i = 0;
+        while (days > dayInM[i]) {
+            if(i == 1 && year % 4 == 0) {
+                days -= 1;
+            }
+            days -= dayInM[i];
+            i++;
+        }
+        return i;
+    }
+
+    private int FindDay(int days, int year) {
+        int i = 0;
+        while (days > dayInM[i]) {
+            if(i == 1 && year % 4 == 0) {
+                days -= 1;
+            }
+            days -= dayInM[i];
+            i++;
+        }
+        return days;
+    }
+
+    public String to_str() {
+        int year, month, day, h, min, sec;
+        sec = (int)(dateInSec % 60);
+        min = (int)(dateInSec / 60 % 60);
+        h = (int)(dateInSec / (60*60) % 24);
+        year = (int)(dateInSec / (365.25 * 24 * 60 * 60));
+        int days = (int)(dateInSec / (24 * 60 * 60) % 365.25);
+        month = FindMounth(days, year);
+        day = FindDay(days, year);
+//        day = (int)(dateInSec / (24 * 60 * 60 * 365.25 * 12) % (dayInM[month]));
+        String a = String.format("%04d-%02d-%02dT%02d:%02d:%02d", year, month, day, h, min, sec);
+        return a;
+    }
     private static void DateToSecond(int year, int month, int day, int h, int min, int sec) {
-        dateInSec = year * 365;
-        dateInSec += (year-1) / 4;
-        for (int i = 1; i < month; ++i) {
-            if (i == 4 || i == 6 || i == 9 || i == 11) {
-                dateInSec += 30;
-            } else if (i == 2 && (year % 4 == 0)) {
-                dateInSec += 29;
-            } else if (i == 2)  {
-                dateInSec += 28;
-            } else {
-                dateInSec += 31;
+        dateInSec = (long)(year * 365.25);
+//        dateInSec += (year-1) / 4;
+        for (int i = 0; i < month; ++i) {
+//            if (i == 4 || i == 6 || i == 9 || i == 11) {
+//                dateInSec += 30;
+//            } else if (i == 2 && (year % 4 == 0)) {
+//                dateInSec += 29;
+//            } else if (i == 2)  {
+//                dateInSec += 28;
+//            } else {
+//                dateInSec += 31;
+//            }
+            dateInSec += dayInM[i];
+            if (year % 4 == 0 && i == 1) {
+                dateInSec += 1;
             }
         }
-        dateInSec += day - 1;
+        dateInSec += day;
         dateInSec = ((dateInSec * 24 + h) * 60 + min) * 60 + sec;
         System.out.println(dateInSec);
     }

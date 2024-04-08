@@ -7,8 +7,8 @@ public class Main {
         String date = scan.nextLine();
         try {
             TimePoint tp = TimePoint.from_str(date);
-//            String a = tp.to_str();
-//            System.out.println(a);
+            String a = tp.to_str();
+            System.out.println(a);
         } catch (DateExceptions message) {
             message.printStackTrace();
         }
