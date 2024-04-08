@@ -103,15 +103,20 @@ public class TimePoint {
         if (day < 1) {
             throw new DateExceptions("Incorrect day");
         }
-        if ((month == 1 || month == 3 || month == 5 || month == 7
-            || month == 8 || month == 10 || month == 12) && day > 31) {
-            throw new DateExceptions("Incorrect day: Max in this month: 31");
-        } else if (month == 2 && (year % 4 == 0) && day > 29) {
-            throw new DateExceptions("Incorrect day: Max in this month in this year: 29");
-        } else if (month == 2 && day > 28) {
-            throw new DateExceptions("Incorrect day: Max in this month in this year: 28");
-        } else if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
-            throw new DateExceptions("Incorrect day: Max in this month: 30");
+//        if ((month == 1 || month == 3 || month == 5 || month == 7
+//            || month == 8 || month == 10 || month == 12) && day > 31) {
+//            throw new DateExceptions("Incorrect day: Max in this month: 31");
+//        } else if (month == 2 && (year % 4 == 0) && day > 29) {
+//            throw new DateExceptions("Incorrect day: Max in this month in this year: 29");
+//        } else if (month == 2 && day > 28) {
+//            throw new DateExceptions("Incorrect day: Max in this month in this year: 28");
+//        } else if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
+//            throw new DateExceptions("Incorrect day: Max in this month: 30");
+//        }
+        if (month == 2 && day > 29) {
+            throw new DateExceptions("Incorrect day");
+        } else if (day > dayInM[month-1]) {
+            throw new DateExceptions("Incorrect day");
         }
         if (h < 0 || h > 23) {
             throw new DateExceptions("Incorrect hour");
