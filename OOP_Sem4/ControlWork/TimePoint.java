@@ -39,7 +39,7 @@ public class TimePoint {
 
     private int FindMounth(int days, int year) {
         int i = 0;
-        while (days > dayInM[i]) {
+        while (days > dayInM[i] + 1) {
             if(i == 1 && year % 4 == 0) {
                 days -= 1;
             }
@@ -51,7 +51,7 @@ public class TimePoint {
 
     private int FindDay(int days, int year) {
         int i = 0;
-        while (days > dayInM[i]) {
+        while (days > dayInM[i] + 1) {
             if(i == 1 && year % 4 == 0) {
                 days -= 1;
             }
@@ -68,7 +68,7 @@ public class TimePoint {
         h = (int)(dateInSec / (60*60) % 24);
         year = (int)(dateInSec / (365.25 * 24 * 60 * 60));
         int days = (int)(dateInSec / (24 * 60 * 60) % 365.25);
-        month = FindMounth(days, year);
+        month = FindMounth(days, year) + 1;
         day = FindDay(days, year);
 //        day = (int)(dateInSec / (24 * 60 * 60 * 365.25 * 12) % (dayInM[month]));
         String a = String.format("%04d-%02d-%02dT%02d:%02d:%02d", year, month, day, h, min, sec);
@@ -77,7 +77,7 @@ public class TimePoint {
     private static void DateToSecond(int year, int month, int day, int h, int min, int sec) {
         dateInSec = (long)(year * 365.25);
 //        dateInSec += (year-1) / 4;
-        for (int i = 0; i < month; ++i) {
+        for (int i = 0; i < month - 1; ++i) {
 //            if (i == 4 || i == 6 || i == 9 || i == 11) {
 //                dateInSec += 30;
 //            } else if (i == 2 && (year % 4 == 0)) {
