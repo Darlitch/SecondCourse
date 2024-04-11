@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-const std::size_t N1 = 16;
-const std::size_t N2 = 16;
-const std::size_t N3 = 16;
+const std::size_t N1 = 1600;
+const std::size_t N2 = 1600;
+const std::size_t N3 = 1600;
 
 double* MatrixBuilder(const std::size_t n1, const std::size_t n2) {
     double* matrix = new double[n1 * n2];
@@ -65,18 +65,32 @@ double* ScatterCols(MPI_Comm* distr_comm, double* m, int* dims, const int len) {
     MPI_Type_commit(&cols);
     MPI_Type_create_resized(cols, 0, len * sizeof(double), &colsFinal);
     MPI_Type_commit(&colsFinal);
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    // if (rank == 0) {
     MPI_Scatter(m, 1, colsFinal, partM, len * N2, MPI_DOUBLE, 0, *distr_comm);
+    // std::cout << m[1] << std::endl;
+    // } else {
+    //     // MPI_Scatter(m, 1, colsFinal, partM, len * N2, MPI_DOUBLE, 0, *distr_comm);
+    // }
     MPI_Type_free(&colsFinal);
     MPI_Type_free(&cols);
     return partM;
 }
 
 double* MultMatrix(double* partA, double* partB, const std::size_t rowsA, const std::size_t colsB) {
-    double* partMatrixC = new double[rowsA * colsB];
-    for (std::size_t i = 0; i < rowsA; ++i) {
-        for (std::size_t j = 0; j < colsB; ++j) {
-            partMatrixC[i * colsB + j] = 0;
-            for (std::size_t k = 0; k < N2; ++k) {
+    double* partMatrixC = new double[rowsA * colsB]{0};
+    // for (std::size_t i = 0; i < rowsA; ++i) {
+    //     for (std::size_t j = 0; j < colsB; ++j) {
+    //         partMatrixC[i * colsB + j] = 0;
+    //         for (std::size_t k = 0; k < N2; ++k) {
+    //             partMatrixC[i * colsB + j] += partA[i * N2 + k] * partB[k * colsB + j];
+    //         }
+    //     }
+    // }
+    for (int i = 0; i < rowsA; i++) {
+        for (int k = 0; k < N2; k++) {
+            for (int j = 0; j < colsB; j++) {
                 partMatrixC[i * colsB + j] += partA[i * N2 + k] * partB[k * colsB + j];
             }
         }
@@ -152,10 +166,19 @@ int main(int argc, char** argv) {
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    if (rank == 0) {
-        matrixA = MatrixBuilder(N1, N2);
-        matrixB = MatrixBuilder(N2, N3);
-    }
+    // if (rank == 0) {
+    matrixA = MatrixBuilder(N1, N2);
+    matrixB = MatrixBuilder(N2, N3);
+    // for (std::size_t i = 0; i < N2; ++i) {
+    //     for (std::size_t j = 0; j < N3; ++j) {
+    //         std::cout << matrixB[i * N3 + j] << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
+    // } else {
+    //     matrixA = new double[N1 * N2];
+    //     matrixB = new double[N2 * N3];
+    // }
 
     startTime = MPI_Wtime();
     MPI_Dims_create(size, 2, dims);
@@ -176,14 +199,14 @@ int main(int argc, char** argv) {
     double* matrixC = GatherC(dims, lenPartA, lenPartB, partC);
 
     // matrixC = MultMatrix(matrixA, matrixB, N1, N3);
-    // if (rank == 0) {
+    if (rank == 0) {
         CheckingSolution(matrixA, matrixB, matrixC);
         endTime = MPI_Wtime();
         std::cout << "Time: " << endTime - startTime << std::endl;
         delete[] matrixA;
         delete[] matrixB;
         delete[] matrixC;
-    // }
+    }
     delete distr_rows_comm;
     delete distr_cols_comm;
     delete[] partA;
