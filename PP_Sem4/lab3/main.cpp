@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-const std::size_t N1 = 3;
-const std::size_t N2 = 2;
-const std::size_t N3 = 6;
+const std::size_t N1 = 16;
+const std::size_t N2 = 16;
+const std::size_t N3 = 16;
 
 double* MatrixBuilder(const std::size_t n1, const std::size_t n2) {
     double* matrix = new double[n1 * n2];
@@ -66,6 +66,8 @@ double* ScatterCols(MPI_Comm* distr_comm, double* m, int* dims, const int len) {
     MPI_Type_create_resized(cols, 0, len * sizeof(double), &colsFinal);
     MPI_Type_commit(&colsFinal);
     MPI_Scatter(m, 1, colsFinal, partM, len * N2, MPI_DOUBLE, 0, *distr_comm);
+    MPI_Type_free(&colsFinal);
+    MPI_Type_free(&cols);
     return partM;
 }
 
@@ -121,6 +123,8 @@ double* GatherC(int* dims, const int sizeA, const int sizeB, double* partC) {
         mC = new double[N1 * N3];
     }
     MPI_Gatherv(partC, sizeA * sizeB, MPI_DOUBLE, mC, sendcounts, displs, partFinale, 0, MPI_COMM_WORLD);
+    MPI_Type_free(&partFinale);
+    MPI_Type_free(&part);
     return mC;
 }
 
@@ -142,8 +146,8 @@ int main(int argc, char** argv) {
     double startTime, endTime;
     int* dims = new int[2]{0};
     int rank, size;
-    double* matrixA;
-    double* matrixB;
+    double* matrixA = nullptr;
+    double* matrixB = nullptr;
 
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -172,27 +176,14 @@ int main(int argc, char** argv) {
     double* matrixC = GatherC(dims, lenPartA, lenPartB, partC);
 
     // matrixC = MultMatrix(matrixA, matrixB, N1, N3);
-    if (rank == 0) {
+    // if (rank == 0) {
         CheckingSolution(matrixA, matrixB, matrixC);
         endTime = MPI_Wtime();
         std::cout << "Time: " << endTime - startTime << std::endl;
         delete[] matrixA;
         delete[] matrixB;
-        delete[] matrixC
-    }
-    // for (std::size_t i = 0; i < N1; ++i) {
-    //     for (std::size_t j = 0; j < N3; ++j) {
-    //         std::cout << matrixC[i * N3 + j] << " ";
-    //     }
-    //     std::cout << std::endl;
+        delete[] matrixC;
     // }
-    // for (std::size_t i = 0; i < N2; ++i) {
-    //     for (std::size_t j = 0; j < N3; ++j) {
-    //         std::cout << matrixB[i * N3 + j] << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
-    // delete[] matrixC;
     delete distr_rows_comm;
     delete distr_cols_comm;
     delete[] partA;
