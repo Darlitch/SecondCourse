@@ -68,6 +68,9 @@ public class TimePoint {
         h = (int)(dateInSec / (60*60) % 24);
         year = (int)(dateInSec / (365.25 * 24 * 60 * 60));
         int days = (int)(dateInSec / (24 * 60 * 60) % 365.25);
+        if (year % 4 != 0) {
+            days++;
+        }
         month = FindMounth(days, year) + 1;
         day = FindDay(days, year);
 //        day = (int)(dateInSec / (24 * 60 * 60 * 365.25 * 12) % (dayInM[month]));
