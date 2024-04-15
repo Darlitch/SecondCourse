@@ -1,12 +1,12 @@
 public class Node {
     public boolean isOper;
+    public int val;
+    public Node left, right;
 
-    public int sym;
-    public Result right = null;
-    public Result left = null;
-
-    public Result(boolean isOper, int sym, char sym, Result left, Result right) {
-        this.right = right;
+    public Node(boolean isOper, int value, Node left, Node right) {
+        this.isOper = isOper;
+        this.val = value;
         this.left = left;
+        this.right = right;
     }
 }
