@@ -3,10 +3,12 @@ package operations;
 import Except.CalcExceptions;
 
 public class Add extends Oper {
-    public double Calculate(double[] argv) throws CalcExceptions {
-        if (argv.length != 2) {
+    public double doOper(Object[] args) throws CalcExceptions {
+        if (args.length != 2) {
             throw new CalcExceptions("Error: invalid count of argv");
         }
-        return argv[0] + argv[1];
+        double arg1 = (double)args[0];
+        double arg2 = (double)args[1];
+        return arg1 + arg2;
     }
 }

@@ -5,12 +5,15 @@ public class Parser {
         this.str = str;
     }
 
-    Node S() {
+    Node S() { // цикл!
         Node leftNode = M();
         if (pointer == str.length()) {
             return leftNode;
         }
-        if (str.charAt(pointer) == '+' || str.charAt(pointer) == '-') {
+        while (str.charAt(pointer) == '+' || str.charAt(pointer) == '-') {
+            if (pointer == str.length()) {
+                return leftNode;
+            }
             int val = str.charAt(pointer);
             pointer++;
             Node rightNode = S();
