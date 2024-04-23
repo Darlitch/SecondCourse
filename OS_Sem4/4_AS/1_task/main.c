@@ -1,5 +1,7 @@
 #include "stdio.h"
 #include "unistd.h"
+#include "stdlib.h"
+#include "string.h"
 
 int c = 5;
 char d = 'a';
@@ -37,7 +39,46 @@ void GlobalVar() {
 void InitLocalVar() {
     int ila;
     ila = 5;
-    return
+    // return &ila;
+    printf("InitLocalVar adress: ila - %p\n", &ila);
+}
+
+void HeapBufffer() {
+    char* buf = (char*)malloc(100);
+    char* buf2 = "hello world!";
+    memcpy(buf, buf2, 12);
+    for (size_t i = 0; i < 100; ++i) {
+        printf("%c", buf[i]);
+    }
+    printf("\n");
+    free(buf);
+    printf("free:\n");
+    for (size_t i = 0; i < 100; ++i) {
+        printf("%c", buf[i]);
+    }
+    printf("\n");
+
+    buf = (char*)malloc(100);
+    memcpy(buf, buf2, 12);
+    for (size_t i = 0; i < 100; ++i) {
+        printf("%c", buf[i]);
+    }
+    printf("\n");
+//     char *buf3 = buf+6;
+    // free(buf + 6);
+    // printf("free2:\n");
+    // for (size_t i = 0; i < 100; ++i) {
+    //     printf("%c", buf[i]);
+    // }
+    // printf("\n");
+}
+
+void EnvVar() {
+    char* vtuber = getenv("vtuber");
+    printf("vtuber = %s\n", vtuber);
+    *vtuber = 'N';
+    *(vtuber+1) = 'O';
+    printf("vtuber = %s\n", vtuber);
 }
 
 int main() {
@@ -46,5 +87,12 @@ int main() {
     StaticVar();
     ConstVar();
     GlobalVar();
+    InitLocalVar();
+    printf("\n");
+    HeapBufffer();
+    printf("\n");
+    EnvVar();
     getchar();
+    // int* ila = InitLocalVar();
+    // printf("InitLocalVar adress: ila - %p\n", ila);
 }
