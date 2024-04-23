@@ -1,6 +1,6 @@
 public class Main {
     public static void main(String[] args) {
-        String formula = "2+2*5+20";
+        String formula = "";
         Parser parser = new Parser(formula);
         Node tree = parser.S();
 //        TreeCalc calc = new TreeCalc();

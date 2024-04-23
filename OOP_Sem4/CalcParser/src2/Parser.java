@@ -11,13 +11,13 @@ public class Parser {
             return leftNode;
         }
         while (str.charAt(pointer) == '+' || str.charAt(pointer) == '-') {
+            int val = str.charAt(pointer);
+            pointer++;
+            Node rightNode = M();
+            leftNode = new Node(true,val, leftNode, rightNode);
             if (pointer == str.length()) {
                 return leftNode;
             }
-            int val = str.charAt(pointer);
-            pointer++;
-            Node rightNode = S();
-            return new Node(true,val, leftNode, rightNode);
         }
         return leftNode;
     }
@@ -27,11 +27,14 @@ public class Parser {
         if (pointer == str.length()) {
             return leftNode;
         }
-        if (str.charAt(pointer) == '*' || str.charAt(pointer) == '/') {
+        while (str.charAt(pointer) == '*' || str.charAt(pointer) == '/') {
             int val = str.charAt(pointer);
             pointer++;
-            Node rightNode = M();
-            return new Node(true,val, leftNode, rightNode);
+            Node rightNode = P();
+            leftNode = new Node(true,val, leftNode, rightNode);
+            if (pointer == str.length()) {
+                return leftNode;
+            }
         }
         return leftNode;
     }
