@@ -5,8 +5,21 @@ public class Parser {
         this.str = str;
     }
 
+    void Skip() {
+        if (pointer == str.length()) {
+            return;
+        }
+        while(str.charAt(pointer) == ' ') {
+            pointer++;
+            if (pointer == str.length()) {
+                return;
+            }
+        }
+    }
     Node S() { // цикл!
+        Skip();
         Node leftNode = M();
+        Skip();
         if (pointer == str.length()) {
             return leftNode;
         }
@@ -23,7 +36,9 @@ public class Parser {
     }
 
     Node M() {
+        Skip();
         Node leftNode = P();
+        Skip();
         if (pointer == str.length()) {
             return leftNode;
         }
@@ -40,6 +55,7 @@ public class Parser {
     }
 
     Node P() {
+        Skip();
         if (pointer == str.length()) {
             return null;
         }
