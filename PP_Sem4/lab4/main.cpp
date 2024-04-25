@@ -91,7 +91,6 @@ int main(int argc, char** argv) {
         fullMatrix = new double[Nx * Ny * Nz];
         fillMatrix(fullMatrix);
     }
-    MPI_Barrier(MPI_COMM_WORLD);
 
     if (!rank) {
         startTime = MPI_Wtime();
