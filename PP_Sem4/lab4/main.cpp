@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
-const double
+constexpr double
     x1 = -2,
     x2 = 1,
     y1 = -3,
@@ -11,16 +11,16 @@ const double
     z1 = -5,
     z2 = 1;
 
-const double a = 100000;
-const double epsilon = 1e-8;
+constexpr double a = 100000;
+constexpr double epsilon = 1e-8;
 
-const int
+constexpr int
     Nx = 1000,
     Ny = 700,
     Nz = 700,
+    size2D = Nx * Ny;
 
 constexpr double
-    size2D = Nx * Ny;
     Dx = x2 - x1,
     Dy = y2 - y1,
     Dz = z2 - z1;
@@ -65,6 +65,7 @@ void fillMatrix(double* matrix) {
 
 int main(int argc, char** argv) {
     int rank, size;
+    double startTime, endTime;
     MPI_Init(&argc, &argv); 
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -92,6 +93,43 @@ int main(int argc, char** argv) {
     }
     MPI_Barrier(MPI_COMM_WORLD);
 
+    if (!rank) {
+        startTime = MPI_Wtime();
+    }
     // Распределение подматриц между процессами
     double* submatrix = new double[sizes[rank] + 2 * size2D];
+    MPI_Scatterv(fullMatrix, sizes, displs, MPI_DOUBLE, submatrix + size2D,
+                 sizes[rank], MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    if (!rank) {
+        std::copy(fullMatrix, fullMatrix + sizes[0], submatrix + size2D);
+    }
+
+    int next = rank + 1;
+    int prev = rank - 1;
+    bool flag = true;
+    bool* flags;
+    double* tmpMatrix = new double[sizes[rank] + 2 * size2D];
+    //просто для красоты
+    if (rank == 0) {
+        prev = -1;
+        flags = new bool[size];
+    }
+    if (rank == size -1) {
+        next = -1;
+    }
+
+
+
+
+
+    if (!rank) {
+        endTime = MPI_Wtime();
+        std::cout << "Time: " << endTime - startTime << std::endl;
+    }
+    delete[] displs;
+    delete[] sizes;
+    delete[] fullMatrix;
+    delete[] submatrix;
+    delete[] tmpMatrix;
+    MPI_Finalize();
 }
