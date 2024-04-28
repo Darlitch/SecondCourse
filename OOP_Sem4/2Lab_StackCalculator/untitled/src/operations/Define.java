@@ -4,7 +4,6 @@ import Calc.ExecutionContext;
 import Except.CalcExceptions;
 
 import java.util.Map;
-import java.util.Stack;
 
 public class Define extends Oper {
     public double doOper(Object[] args) throws CalcExceptions {
