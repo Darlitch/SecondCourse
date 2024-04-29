@@ -22,6 +22,8 @@ public class Main {
 //            for (String command: commands) {
 //                System.out.println(command);
 //            }
+            Parser calc = new Calculator();
+            calc.parsing(commands);
         } catch (CalcExceptions e) {
             System.out.println(e.getMessage());
         } catch (IOException | InputMismatchException e) {

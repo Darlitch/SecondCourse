@@ -3,10 +3,11 @@ package operations;
 import Calc.ExecutionContext;
 import Except.CalcExceptions;
 
+import java.util.Map;
 import java.util.Stack;
 
 public class Push extends Oper {
-    public double doOper(Object[] args) throws CalcExceptions {
+    public void doOper(Object[] args) throws CalcExceptions {
 //        if (args.length != 2) {
 //            throw new CalcExceptions("Error: invalid count of args");
 //        }
@@ -16,8 +17,8 @@ public class Push extends Oper {
         }
         ExecutionContext ec = (ExecutionContext)args[0];
         Stack<Double> stack = ec.getStack();
-        double val = (double)args[1];
+        Map<String,Double> map = ec.getParameterMap();
+        double val = map.get((String)args[1]);
         stack.push(val);
-        return 0;
     }
 }

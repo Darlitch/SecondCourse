@@ -6,7 +6,7 @@ import Except.CalcExceptions;
 import java.util.Stack;
 
 public class Sqrt extends Oper {
-    public double doOper(Object[] args) throws CalcExceptions {
+    public void doOper(Object[] args) throws CalcExceptions {
 //        if (args.length != 1) {
 //            throw new CalcExceptions("Error: invalid count of args");
 //        }
@@ -20,6 +20,6 @@ public class Sqrt extends Oper {
         if (stack.isEmpty()) {
             throw new CalcExceptions("Error: There are not enough elements in the stack to perform the operation");
         }
-        return Math.sqrt(stack.pop());
+        stack.push(Math.sqrt(stack.pop()));
     }
 }

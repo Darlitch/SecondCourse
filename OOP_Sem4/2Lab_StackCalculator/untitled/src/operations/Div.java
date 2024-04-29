@@ -6,7 +6,7 @@ import Except.CalcExceptions;
 import java.util.Stack;
 
 public class Div extends Oper {
-    public double doOper(Object[] args) throws CalcExceptions {
+    public void doOper(Object[] args) throws CalcExceptions {
 //        if (args.length != 2) {
 //            throw new CalcExceptions("Error: invalid count of args");
 //        }
@@ -26,6 +26,6 @@ public class Div extends Oper {
         }
         double arg1 = stack.pop();
         double arg2 = stack.pop();
-        return arg2 / arg1;
+        stack.push(arg2/arg1);
     }
 }

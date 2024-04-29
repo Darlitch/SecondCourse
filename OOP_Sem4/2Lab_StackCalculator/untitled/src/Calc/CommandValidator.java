@@ -27,7 +27,7 @@ public class CommandValidator {
                 throw new CalcExceptions("Error: Invalid number of command arguments: " + cmd);
             }
         } else if (cmd.charAt(0) != '#') {
-            throw new CalcExceptions("Error: Unknown command: " + cmd);
+            throw new CalcExceptions("Error VC: Unknown command: " + cmd);
         }
     }
 
