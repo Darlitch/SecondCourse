@@ -1,6 +1,7 @@
 package Calc;
 
 import Except.CalcExceptions;
+import operations.Oper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,35 +27,43 @@ public abstract class Parser {
                 continue;
             }
             CommandValidator.validateCommand(args[0].toUpperCase(), args.length);
+            // свитч для длинны аргументов комманды?
             switch (args[0].toUpperCase()) {
                 case "DEFINE":
+                    System.out.println("define\n");
                     break;
                 case "PUSH":
+                    System.out.println("push\n");
                     break;
                 case "POP":
+                    System.out.println("pop\n");
                     break;
                 case "PRINT":
+                    System.out.println("print\n");
                     break;
                 case "SQRT":
+                    System.out.println("sqrt\n");
                     break;
                 case "+":
+                    System.out.println("+\n");
                     break;
                 case "-":
+                    System.out.println("-\n");
                     break;
                 case "*":
+                    System.out.println("*\n");
                     break;
                 case "/":
+                    System.out.println("/\n");
                     break;
                 default:
-                    if (args[0].charAt(0) == '#') {
-                        break;
-                    } else {
-                        throw new CalcExceptions("Error: Unknown command: " + args[0]);
-                    }
+                    break;
 
             }
         }
     }
+
+    protected abstract Oper calculating(CommandsEn type, Object[] args);
 
 //    private void checkComand(String cmd, int len) throws CalcExceptions {
 //        switch (cmd) {

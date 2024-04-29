@@ -30,4 +30,8 @@ public class CommandValidator {
             throw new CalcExceptions("Error: Unknown command: " + cmd);
         }
     }
+
+    public static int CmdLength(String cmd) {
+        return commandLengths.get(cmd);
+    }
 }
