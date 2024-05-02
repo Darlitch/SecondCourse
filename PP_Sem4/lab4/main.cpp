@@ -15,9 +15,9 @@ constexpr double a = 100000;
 constexpr double epsilon = 1e-8;
 
 constexpr int
-    Nx = 500,
-    Ny = 350,
-    Nz = 350,
+    Nx = 1000,
+    Ny = 700,
+    Nz = 700,
     size2D = Nx * Ny;
 
 constexpr double
