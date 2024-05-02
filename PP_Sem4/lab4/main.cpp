@@ -1,28 +1,29 @@
+#include <math.h>
 #include <mpi.h>
 
 #include <algorithm>
 #include <iostream>
 
 constexpr double
-    x1 = -2,
+    x1 = -1,
     x2 = 1,
-    y1 = -3,
+    yFirst = -1,
     y2 = 1,
-    z1 = -5,
+    z1 = -1,
     z2 = 1;
 
 constexpr double a = 100000;
 constexpr double epsilon = 1e-8;
 
 constexpr int
-    Nx = 1000,
-    Ny = 700,
-    Nz = 700,
+    Nx = 250,
+    Ny = 250,
+    Nz = 250,
     size2D = Nx * Ny;
 
 constexpr double
     Dx = x2 - x1,
-    Dy = y2 - y1,
+    Dy = y2 - yFirst,
     Dz = z2 - z1;
 
 constexpr double
@@ -32,17 +33,29 @@ constexpr double
 
 double Fi(double x, double y, double z) {
     x = x1 + x * hx;
-    y = y1 + y * hy;
+    y = yFirst + y * hy;
     z = z1 + z * hz;
+    return x * x + y * y + z * z;
+}
+
+double F(double x, double y, double z) {
     return x * x + y * y + z * z;
 }
 
 double ro(double x, double y, double z) {
     // auto fi = Fi(x, y, z);
     // x = x1 + x * hx;
-    // y = y1 + y * hy;
+    // y = yFirst + y * hy;
     // z = z1 + z * hz;
-    return 6 - a * Fi(x, y, z);
+    return (6 - a * Fi(x, y, z));
+}
+
+int OffSet(int size, int rank) {
+    int count = 0;
+    for (int i = 0; i < rank; i++) {
+        count += (Nz / size) + (int)(Nz % size > i);
+    }
+    return count;
 }
 
 bool isLimit(int x, int y, int z, int height, int width, int depth) {
@@ -118,18 +131,20 @@ int main(int argc, char** argv) {
     }
 
     while (flag) {
-        MPI_Request trash = MPI_REQUEST_NULL;
+        MPI_Request sNext, sPrev;
         MPI_Request rNext, rPrev;
-
+        if (rank == 0) {
+            printf("iter\n");
+        }
         // Отправляем и получаем граничные значения между процессами
         if (rank != 0) {
             MPI_Isend(submatrix + size2D, size2D, MPI_DOUBLE, prev, 0,
-                      MPI_COMM_WORLD, &trash);
+                      MPI_COMM_WORLD, &sPrev);
             MPI_Irecv(submatrix, size2D, MPI_DOUBLE, prev, 1, MPI_COMM_WORLD, &rPrev);
         }
         if (rank != size - 1) {
             MPI_Isend(submatrix + sizes[rank], size2D, MPI_DOUBLE, next, 1,
-                      MPI_COMM_WORLD, &trash);
+                      MPI_COMM_WORLD, &sNext);
             MPI_Irecv(submatrix + sizes[rank] + size2D, size2D, MPI_DOUBLE, next,
                       0, MPI_COMM_WORLD, &rNext);
         }
@@ -137,12 +152,14 @@ int main(int argc, char** argv) {
         // Если мы в процессе с рангом 0, то нет предыдущего процесса
         if (!rank) {
             rPrev = MPI_REQUEST_NULL;
+            sPrev = MPI_REQUEST_NULL;
         }
         // Если мы в последнем процессе, то нет следующего процесса
         if (rank == size - 1) {
             rNext = MPI_REQUEST_NULL;
+            sNext = MPI_REQUEST_NULL;
         }
-        double alpha = 1 / (2 / (hx * hx) + 2 / (hy * hy) + 2 / (hz + hz) + a);
+        double alpha = 1 / (2 / (hx * hx) + 2 / (hy * hy) + 2 / (hz * hz) + a);
         // Смещение для текущей подматрицы
         int displ = 0;
         for (int i = 0; i < rank; ++i) {
@@ -155,26 +172,30 @@ int main(int argc, char** argv) {
             int realZ = realI / (size2D),
                 realY = (realI - realZ * size2D) / Nx,
                 realX = realI - realZ * size2D - realY * Nx;
-
             int curZ = i / size2D - 1,
                 curY = realY,
                 curX = realX;
             if (!isLimit(curX, curY, curZ, Nx, Ny, sizes[rank] / size2D) &&
                 !isLimit(realX, realY, realZ, Nx, Ny, Nz)) {
-                auto tmpX = (submatrix[i - 1] + submatrix[i + 1]) / hx * hx,
-                     tmpY = (submatrix[i - Nx] + submatrix[i + Nx]) / hy * hy,
-                     tmpZ = (submatrix[i - size2D] + submatrix[i + size2D]) / hz * hz;
+                auto tmpX = (submatrix[i - 1] + submatrix[i + 1]) / (hx * hx),
+                     tmpY = (submatrix[i - Nx] + submatrix[i + Nx]) / (hy * hy),
+                     tmpZ = (submatrix[i - size2D] + submatrix[i + size2D]) / (hz * hz);
                 auto tmpRo = ro(realX, realY, realZ);
 
                 tmpMatrix[i] = alpha * (tmpX + tmpY + tmpZ - tmpRo);
+                // if (realZ == 1 && realY == 1 && realX == 1) {
+                //     std::cout << tmpX << "  " << tmpY << "  " << tmpZ << "  " << tmpMatrix[i] << std::endl;
+                // }
             }
         }
 
         // Ожидаем завершения всех неблокирующих операций
-        MPI_Request requestArray[2];
+        MPI_Request requestArray[4];
         requestArray[0] = rNext;
         requestArray[1] = rPrev;
-        if (MPI_Waitall(2, requestArray, MPI_STATUS_IGNORE) != MPI_SUCCESS) {
+        requestArray[2] = sNext;
+        requestArray[3] = sPrev;
+        if (MPI_Waitall(4, requestArray, MPI_STATUS_IGNORE) != MPI_SUCCESS) {
             std::cout << "Rank: " << rank << " error on waitall" << std::endl;
         }
 
@@ -195,9 +216,9 @@ int main(int argc, char** argv) {
 
             if (curZ == 0 || curZ == (sizes[rank] / size2D) - 1) {
                 // Вычисление значений направлений x, y, z для элемента
-                auto tmpX = (submatrix[i - 1] + submatrix[i + 1]) / hx * hx;
-                auto tmpY = (submatrix[i - Nx] + submatrix[i + Nx]) / hy * hy;
-                auto tmpZ = (submatrix[i - size2D] + submatrix[i + size2D]) / hz * hz;
+                auto tmpX = (submatrix[i - 1] + submatrix[i + 1]) / (hx * hx);
+                auto tmpY = (submatrix[i - Nx] + submatrix[i + Nx]) / (hy * hy);
+                auto tmpZ = (submatrix[i - size2D] + submatrix[i + size2D]) / (hz * hz);
                 auto tmpRo = ro(realX, realY, realZ);
 
                 // Вычисление нового значения для элемента в временной подматрице
@@ -231,9 +252,56 @@ int main(int argc, char** argv) {
         // Копируем временную подматрицу в основную подматрицу
         std::copy(tmpMatrix, tmpMatrix + sizes[rank] + 2 * size2D, submatrix);
     }
+    double delta = 0;
+    // int sizeZ = (Nz / size) + (int)(Nz % size > rank);
+    // for (size_t i = 0, z = 0; i < sizeZ; ++i) {
+    //     for (size_t j = 0; j < Ny; j++) {
+    //         for (size_t k = 0; k < Nx; k++) {
+    //             delta = std::fmax(delta, Fi(k, j, (i) + OffSet(size, rank)) - submatrix[size2D + i * size2D + j * Ny + k]);
+    //             z++;
+    //             printf("%lf    %lf \n", Fi(k, j, (i) + OffSet(size, rank)), submatrix[size2D + i * size2D + j * Ny + k]);
+    //             getchar();
+    //         }
+    //     }
+    // }
+    // printf("%lf \n", delta);
+    // double fullDelta = 0;
+    // MPI_Allreduce(&delta, &fullDelta, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    // if (rank == 0) {
+    //     printf("%lf \n", fullDelta);
+    // }
 
     MPI_Gatherv(submatrix + size2D, sizes[rank], MPI_DOUBLE, fullMatrix,
                 sizes, displs, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    if (rank == 0) {
+        for (std::size_t i = 0; i < Nz; ++i) {
+            for (std::size_t j = 0; j < Ny; ++j) {
+                for (std::size_t k = 0; k < Nx; ++k) {
+                    // if (i == 50 && j == 50 && k == 50) {
+                    // printf("%lf    %lf   %ld    %ld   %ld\n", Fi(k, j, i), fullMatrix[i * size2D + j * Ny + k], k, j, i);
+                    // }
+                    delta = fmax(delta, abs(Fi(k, j, i) - fullMatrix[i * size2D + j * Ny + k]));
+                }
+            }
+        }
+        printf("%lf \n", delta);
+    }
+    // if (rank == 0) {
+    //     for (std::size_t i = 0; i < Nz; ++i) {
+    //         for (std::size_t j = 0; j < Ny; ++j) {
+    //             for (std::size_t k = 0; k < Nx; ++k) {
+    //                 // if (i == 50 && j == 50 && k == 50) {
+    //                 printf("%lf ", fullMatrix[i * size2D + j * Ny + k]);
+    //                 // }
+    //                 // delta = fmax(delta, abs(Fi(k, j, i) - fullMatrix[i * size2D + j * Ny + k]));
+    //             }
+    //             printf("\n");
+    //         }
+    //         printf("-------------------\n");
+    //     }
+    //     // printf("%lf \n", delta);
+    // }
 
     if (!rank) {
         endTime = MPI_Wtime();
