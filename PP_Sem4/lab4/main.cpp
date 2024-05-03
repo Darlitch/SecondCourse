@@ -16,9 +16,9 @@ constexpr double a = 100000;
 constexpr double epsilon = 1e-8;
 
 constexpr int
-    Nx = 250,
-    Ny = 250,
-    Nz = 250,
+    Nx = 400,
+    Ny = 400,
+    Nz = 400,
     size2D = Nx * Ny;
 
 constexpr double
@@ -274,19 +274,6 @@ int main(int argc, char** argv) {
     MPI_Gatherv(submatrix + size2D, sizes[rank], MPI_DOUBLE, fullMatrix,
                 sizes, displs, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    if (rank == 0) {
-        for (std::size_t i = 0; i < Nz; ++i) {
-            for (std::size_t j = 0; j < Ny; ++j) {
-                for (std::size_t k = 0; k < Nx; ++k) {
-                    // if (i == 50 && j == 50 && k == 50) {
-                    // printf("%lf    %lf   %ld    %ld   %ld\n", Fi(k, j, i), fullMatrix[i * size2D + j * Ny + k], k, j, i);
-                    // }
-                    delta = fmax(delta, abs(Fi(k, j, i) - fullMatrix[i * size2D + j * Ny + k]));
-                }
-            }
-        }
-        printf("%lf \n", delta);
-    }
     // if (rank == 0) {
     //     for (std::size_t i = 0; i < Nz; ++i) {
     //         for (std::size_t j = 0; j < Ny; ++j) {
@@ -306,6 +293,19 @@ int main(int argc, char** argv) {
     if (!rank) {
         endTime = MPI_Wtime();
         std::cout << "Time: " << endTime - startTime << std::endl;
+    }
+    if (rank == 0) {
+        for (std::size_t i = 0; i < Nz; ++i) {
+            for (std::size_t j = 0; j < Ny; ++j) {
+                for (std::size_t k = 0; k < Nx; ++k) {
+                    // if (i == 50 && j == 50 && k == 50) {
+                    // printf("%lf    %lf   %ld    %ld   %ld\n", Fi(k, j, i), fullMatrix[i * size2D + j * Ny + k], k, j, i);
+                    // }
+                    delta = fmax(delta, abs(Fi(k, j, i) - fullMatrix[i * size2D + j * Ny + k]));
+                }
+            }
+        }
+        printf("%lf \n", delta);
     }
     delete[] displs;
     delete[] sizes;
