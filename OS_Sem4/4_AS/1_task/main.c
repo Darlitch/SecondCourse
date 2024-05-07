@@ -52,6 +52,11 @@ void HeapBufffer() {
     }
     printf("\n");
     free(buf);
+    // int temp = 100;
+    // while(1) {
+    //     temp+=100;
+    //     printf("buf: %p\n");
+    // }
     printf("free:\n");
     for (size_t i = 0; i < 100; ++i) {
         printf("%c", buf[i]);
@@ -84,13 +89,19 @@ void EnvVar() {
 int main() {
     printf("pid: %d\n", getpid());
     LocalVar();
+    // getchar();
     StaticVar();
+    // getchar();
     ConstVar();
+    // getchar();
     GlobalVar();
+    // getchar();
     InitLocalVar();
     printf("\n");
+    // getchar();
     HeapBufffer();
     printf("\n");
+    // getchar();
     EnvVar();
     getchar();
     // int* ila = InitLocalVar();
