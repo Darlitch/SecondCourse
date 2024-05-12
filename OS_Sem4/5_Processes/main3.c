@@ -36,12 +36,6 @@ int main() {
     default:
         sleep(30);
         int status;
-        wait(&status);
-        if (WIFEXITED(status)) {
-            printf("Child process exited with status: %d\n", WEXITSTATUS(status));
-        } else {
-            printf("Child process did not exit normally\n");
-        }
         printf("Parent globalVAR: %d\n", globalVar);
         printf("Parent localVar: %d\n", localVar);
         break;
