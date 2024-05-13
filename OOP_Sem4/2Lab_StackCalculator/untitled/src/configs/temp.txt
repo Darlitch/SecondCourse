@@ -9,3 +9,5 @@ PUSH b
 POP
 sqrt
 PRINT
+PRINT
++
