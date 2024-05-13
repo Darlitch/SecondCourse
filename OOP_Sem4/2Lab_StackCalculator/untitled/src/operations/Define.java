@@ -6,6 +6,12 @@ import Except.CalcExceptions;
 import java.util.Map;
 
 public class Define extends Oper {
+    private Define(){
+        super();
+    }
+    public static Define newInstance() {
+        return new Define();
+    }
     public void doOper(Object[] args) throws CalcExceptions {
         if (args.length != 3) {
             throw new CalcExceptions("Error: invalid count of args");

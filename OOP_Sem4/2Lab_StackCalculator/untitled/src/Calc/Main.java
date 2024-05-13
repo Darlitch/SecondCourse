@@ -17,11 +17,6 @@ public class Main {
             } else {
                 throw new CalcExceptions("Error: Invalid number of arguments");
             }
-//            Parser parser = new Parser();
-//            parser.parsing(commands);
-//            for (String command: commands) {
-//                System.out.println(command);
-//            }
             Parser calc = new Calculator();
             calc.parsing(commands);
         } catch (CalcExceptions e) {

@@ -5,17 +5,16 @@ import Except.CalcExceptions;
 
 import java.util.Stack;
 
+import static java.lang.Math.abs;
+
 public class Div extends Oper {
+    private Div(){
+        super();
+    }
+    public static Div newInstance() {
+        return new Div();
+    }
     public void doOper(Object[] args) throws CalcExceptions {
-//        if (args.length != 2) {
-//            throw new CalcExceptions("Error: invalid count of args");
-//        }
-//        double arg1 = (double)args[0];
-//        double arg2 = (double)args[1];
-//        if (arg1 == 0) {
-//            throw new CalcExceptions("Error: division by zero");
-//        }
-//        return arg1 / arg2;
         if (args.length != 1) {
             throw new CalcExceptions("Error: invalid count of argv");
         }
@@ -26,6 +25,9 @@ public class Div extends Oper {
         }
         double arg1 = stack.pop();
         double arg2 = stack.pop();
+        if (abs(arg1 - 0) < 0.00001) {
+            throw new CalcExceptions("Error: Division by zero");
+        }
         stack.push(arg2/arg1);
     }
 }

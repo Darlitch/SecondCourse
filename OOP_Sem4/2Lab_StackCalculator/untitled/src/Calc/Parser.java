@@ -25,11 +25,9 @@ public abstract class Parser {
             String upperCaseCmd = args[0].toUpperCase();
             CommandValidator.validateCommand(upperCaseCmd, args.length);
             Object[] argsObj = takeObjArgs(args, CommandValidator.CmdLength(upperCaseCmd));
-            Oper oper = calculating(upperCaseCmd);
+            Oper oper = newInstance(upperCaseCmd);
             oper.doOper(argsObj);
         }
-//        Oper oper = calculating("PRINT");
-//        oper.doOper(new Object[]{ec});
     }
 
     private Object[] takeObjArgs(String[] args, int lenArgs) {
@@ -49,5 +47,5 @@ public abstract class Parser {
         return argsObj;
     }
 
-    protected abstract Oper calculating(String oper) throws CalcExceptions;
+    protected abstract Oper newInstance(String oper) throws CalcExceptions;
 }
