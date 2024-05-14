@@ -7,12 +7,12 @@ import java.util.Map;
 import java.util.Stack;
 
 public class Push extends Oper {
-    private Push(){
-        super();
-    }
-    public static Push newInstance() {
-        return new Push();
-    }
+//    private Push(){
+//        super();
+//    }
+//    public static Push newInstance() {
+//        return new Push();
+//    }
     public void doOper(Object[] args) throws CalcExceptions {
 //        if (args.length != 2) {
 //            throw new CalcExceptions("Error: invalid count of args");

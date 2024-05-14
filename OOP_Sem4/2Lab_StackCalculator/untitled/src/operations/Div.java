@@ -8,12 +8,12 @@ import java.util.Stack;
 import static java.lang.Math.abs;
 
 public class Div extends Oper {
-    private Div(){
-        super();
-    }
-    public static Div newInstance() {
-        return new Div();
-    }
+//    private Div(){
+//        super();
+//    }
+//    public static Div newInstance() {
+//        return new Div();
+//    }
     public void doOper(Object[] args) throws CalcExceptions {
         if (args.length != 1) {
             throw new CalcExceptions("Error: invalid count of argv");

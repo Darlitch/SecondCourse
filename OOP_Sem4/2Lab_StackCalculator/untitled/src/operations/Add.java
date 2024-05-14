@@ -6,12 +6,12 @@ import Except.CalcExceptions;
 import java.util.Stack;
 
 public class Add extends Oper {
-    private Add(){
-        super();
-    }
-    public static Add newInstance() {
-        return new Add();
-    }
+//    private Add(){
+//        super();
+//    }
+//    public static Add newInstance() {
+//        return new Add();
+//    }
     public void doOper(Object[] args) throws CalcExceptions {
         if (args.length != 1) {
             throw new CalcExceptions("Error: invalid count of argv");

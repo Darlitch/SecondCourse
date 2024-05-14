@@ -6,12 +6,12 @@ import Except.CalcExceptions;
 import java.util.Stack;
 
 public class Sub extends Oper {
-    private Sub(){
-        super();
-    }
-    public static Sub newInstance() {
-        return new Sub();
-    }
+//    private Sub(){
+//        super();
+//    }
+//    public static Sub newInstance() {
+//        return new Sub();
+//    }
     public void doOper(Object[] args) throws CalcExceptions {
 //        if (args.length != 2) {
 //            throw new CalcExceptions("Error: invalid count of args");
