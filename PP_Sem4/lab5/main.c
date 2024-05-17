@@ -18,7 +18,7 @@ void InitTasks(int* tasks) {
     // srand(time(NULL));
     for (int i = 0; i < TASKS_SIZE; ++i) {
         // tasks[i] = rand() % 10 + 1;
-        tasks[i] = i + 1;
+        tasks[i] = TASKS_SIZE - i;
     }
 }
 
@@ -130,6 +130,15 @@ int main(int argc, char** argv) {
         InitTasks(tasks);
     }
     localTaskCounter = GetCount(rank, size);
+    // if (rank == 0) {
+    //     localTasks = tasks;
+    //     localTaskCounter = 20;
+    // } else {
+    //     localTasks = (int*)malloc(2 * sizeof(int));
+    //     localTasks[0] = 0;
+    //     localTasks[1] = 0;
+    //     localTaskCounter = 2;
+    // }
     localTasks = (int*)malloc(localTaskCounter * sizeof(int));
     MPI_Barrier(MPI_COMM_WORLD);
     SharedWork(rank, size);
