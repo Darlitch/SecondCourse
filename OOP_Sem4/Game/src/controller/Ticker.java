@@ -9,6 +9,7 @@ public class Ticker extends Thread {
 
     @Override
     public void run() {
+        // Пока не прерван поток
         while (!isInterrupted()) {
             try {
                 Thread.sleep(15);

@@ -66,7 +66,7 @@ public abstract class Entity {
         x += speedX;
         y += speedY;
     }
-
+    //Метод для проверки столкновения с другим энтити
     public boolean collide(Entity other) {
         int rightX = x + width;
         int bottomY = y + height;

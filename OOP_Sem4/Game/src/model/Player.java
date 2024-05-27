@@ -8,8 +8,9 @@ public class Player extends Ship {
     public static final int playerWidth = 60;
     public static final int playerHeight = 40;
     public static final int playerSpeed = 4;
-
+    // Таймаут между выстрелами игрока
     private final int shootTimeout;
+    // Время последнего выстрела игрока
     private long lastShotTime;
 
     public Player(int x, int y, int shootTimeout) {

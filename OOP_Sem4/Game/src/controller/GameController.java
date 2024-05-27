@@ -21,11 +21,11 @@ public class GameController implements KeyListener, TickerListener {
     private final GameDifficulty difficulty;
 
     private ModelListener modelListener;
-    private final Ticker ticker;
+    private final Ticker ticker; // Таймер
 
     public GameController(GameDifficulty difficulty) {
         this.difficulty = difficulty;
-
+        //интервал между выстрелами игрока
         int shootTimeout = switch (difficulty) {
             case LEVEL1 -> 700;
             case LEVEL2 -> 900;
@@ -55,22 +55,23 @@ public class GameController implements KeyListener, TickerListener {
             case LEVEL2 -> 800;
             case LEVEL3 -> 400;
         };
-
+        // Создание врагов в ряд по краям игрового поля
         for (int i = offset; i < (fieldWidth - offset); i += enemyWidth) {
             ships.add(new EnemyDefault(i, 10, shootFreqModifier));
         }
     }
-
+    // Метод для обновления состояния игры
     public void update() {
         if (gameState == GameState.DEAD) {
-            notifyListener();
+            notifyListener(); // уведомляем слушателя
             return;
         }
 
-        checkCollisions();
+        checkCollisions(); // Проверка столкновений
 
-        if (canMove(player)) player.move();
-        int speedModifier = moveEnemies() ? 1 : -1;
+        if (canMove(player)) player.move(); // перемещаем игрока, если это возможно
+        int speedModifier = moveEnemies() ? 1 : -1; // направление движения врагов
+        // Перемешение врагов и выстрелы
         for (Ship ship : ships) {
             if (ship == player) continue;
             ship.setSpeedX(ship.getSpeedX() * speedModifier);
@@ -81,12 +82,12 @@ public class GameController implements KeyListener, TickerListener {
                 bullets.add(bullet);
             }
         }
-
+        // Если все уничтожены, то восстанавливаем ХП и спавним новых
         if (ships.size() == 1) {
             spawnEnemies();
             player.increaseHealth();
         }
-        notifyListener();
+        notifyListener(); // уведомляем слушателя
     }
 
     private void checkCollisions() {

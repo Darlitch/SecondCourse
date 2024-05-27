@@ -20,6 +20,7 @@ public class EnemyDefault extends Enemy {
 
     @Override
     public Bullet shoot() {
+        // Враг по умолчанию выстреливает с некоторой вероятностью
         int randomInt = random.nextInt(shootFrequencyModifier);
         if (randomInt < 2) return new BulletDefault(this, BulletDirection.DOWN);
         return null;
