@@ -4,19 +4,33 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class InputResolver {
-    public static int Resolve(String ipAddr) throws UnknownHostException {
-        int mode = -1;
+    public static String resolve(String[] args) throws UnknownHostException {
+        String ipVer = addrCheck(args[0]);
+        portCheck(args[1]);
+        return ipVer;
+    }
+
+    private static String addrCheck(String addrStr) throws UnknownHostException {
         try {
-            InetAddress addr = InetAddress.getByName(ipAddr);
-            if (addr instanceof Inet4Address) {
-               mode = 0;
-            } else if (addr instanceof Inet6Address) {
-                mode = 1;
+            InetAddress addr = InetAddress.getByName(addrStr);
+            if (addr instanceof Inet4Address && addr.isMulticastAddress()) {
+                return  "IPv4";
+            } else if (addr instanceof Inet6Address && addr.isMulticastAddress()) {
+                return "IPv6";
+            } else {
+                throw new UnknownHostException();
             }
         } catch (UnknownHostException ex) {
             throw new UnknownHostException();
         }
-        return mode;
     }
+
+    private static void portCheck(String port) throws UnknownHostException {
+        if (port.length() != 4 && port.length() != 5) {
+            throw new UnknownHostException();
+        }
+    }
+
+
 
 }

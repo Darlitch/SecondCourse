@@ -1,10 +1,10 @@
-import java.net.UnknownHostException;
+import java.io.IOException;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
-    public static void main(String[] args) throws UnknownHostException {
-        Controller controller = new Controller(args[0]);
-        controller.Start();
+    public static void main(String[] args) throws IOException {
+        Controller controller = new Controller(args);
+//        controller.start();
     }
 }
