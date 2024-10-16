@@ -15,11 +15,12 @@ public class Controller {
         datagram.addr = InetAddress.getByName(args[0]);
         datagram.ipVer = ipVer;
         datagram.port = Integer.parseInt(args[1]);
-        datagram.msg = "Hello".getBytes();
+        datagram.msg = args[2].getBytes();
         datagram.socket = new MulticastSocket(datagram.port);
     }
     public void start() throws IOException, InterruptedException {
-        datagram.socket.joinGroup(datagram.addr);
+        datagram.socket.joinGroup(datagram.addr); // через нетворк интерфейс сделать
+//        datagram.socket.setNetworkInterface(?); // через нетворк интерфейс сделать
 
         Sender sender = new Sender();
         Listener listener = new Listener();
@@ -75,7 +76,7 @@ public class Controller {
         public void run() {
             while(true) {
                 observer.removeDeadCopies();
-                observer.printLiveCopies();
+//                observer.printLiveCopies();
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {

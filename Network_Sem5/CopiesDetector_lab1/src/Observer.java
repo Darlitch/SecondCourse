@@ -1,5 +1,8 @@
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Iterator;
 
 public class Observer {
     private Map<String, Long> liveCopies;
@@ -10,17 +13,30 @@ public class Observer {
     }
 
     // ДОДЕЛАТЬ ФЛАГИ
-    public void updateLiveCopies(Datagram datagram) {
-        String key = datagram.addr.toString() + ":" + Integer.toString(datagram.port);
+    public void updateLiveCopies(Datagram datagram) throws UnsupportedEncodingException {
+        int oldSize = liveCopies.size();
+        String msg = new String(datagram.msg, "UTF-8");
+        // СДЕЛАТЬ ЧЕРЕЗ ДЛИННУ СООБЩЕНИЯ
+        String key = datagram.addr.toString().substring(1) + ":" + Integer.toString(datagram.port) + " - " + msg.replaceAll("[^\\p{Print}]", "");
         liveCopies.put(key, System.currentTimeMillis());
+        if (liveCopies.size() > oldSize) {
+            printLiveCopies();
+        }
     }
 
     public void removeDeadCopies() {
         long currTime = System.currentTimeMillis();
-        for (String key : liveCopies.keySet()) {
-            if (currTime - liveCopies.get(key) > timeout) {
-                liveCopies.remove(key);
+        int flag = 0;
+        Iterator<Map.Entry<String, Long>> iterator = liveCopies.entrySet().iterator();
+        while(iterator.hasNext()) {
+            Map.Entry<String, Long> entry = iterator.next();
+            if (currTime - entry.getValue() > timeout) {
+                iterator.remove();
+                flag = 1;
             }
+        }
+        if (flag == 1) {
+            printLiveCopies();
         }
     }
 
@@ -32,5 +48,6 @@ public class Observer {
         for (String key : liveCopies.keySet()) {
             System.out.println(key);
         }
+        System.out.println(" ");
     }
 }
