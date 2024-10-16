@@ -1,0 +1,47 @@
+import string;
+import lingo/pegcode/driver;
+import grammar;
+
+export {
+    Calculate(e : Expr) -> int;
+}
+
+
+Calculate(e : Expr) -> int {
+    switch(e) {
+        Add(l,r) : Calculate(l) + Calculate(r);
+        Mult(l,r) : Calculate(l) * Calculate(r);
+        IntConst(i) : i;
+    }
+}
+
+Arr2StrInside(e: Expr, flag : int) -> string {
+    switch(e) {
+        IntConst(i) : i2s(i);
+        Mult(l, r) : Arr2StrInside(l, 1) + "*" + Arr2StrInside(r, 1);
+        Add(l, r) : {
+            expr = Arr2StrInside(l, 0) + "+" + Arr2StrInside(r,0);
+            if (flag == 1) {
+                "(" + expr + ")";
+            } else {
+                expr;
+            }
+        } 
+    }
+}
+
+Arr2Str(e: Expr) {
+    Arr2StrInside(e, 0);
+}
+
+s2Arr(s : string) -> Expr {
+    parsic(compilePegGrammar("#include grammar.lingo"), s, defaultPegActions);
+}
+
+
+
+main() {
+    var = " (2 + 4) * 2 ";
+    println(Calculate(s2Arr(var)));
+    println(Arr2Str(s2Arr(var)));
+}

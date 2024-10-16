@@ -1,0 +1,22 @@
+// Implement a calculator, which uses a reverse polish notation (RPN) expressions with int consts, + and *, and calculates its values. 
+// Write a translation functions from the arithmetic expressions to RPN and back.
+import grammar;
+import string;
+import labs/block2/lab5/lab5;
+
+Ar2RPN(ar : Expr) -> [ExprRPN] {
+    switch(ar) {
+        Mult(a, b) : concat(concat(Ar2RPN(a), Ar2RPN(b)), [MultRPN]);
+        Summ(a, b) : concat(concat(Ar2RPN(a), Ar2RPN(b)), [SummRPN]);
+        IntConst(i) : [IntRPN(i)];
+    }
+}
+
+RPN2Ar() -> Expr {
+
+}
+
+main() {
+    var = " 2 4 + ";
+    
+}
