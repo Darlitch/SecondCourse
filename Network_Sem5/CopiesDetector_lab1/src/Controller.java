@@ -1,6 +1,8 @@
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
 
 public class Controller {
     private Datagram datagram;
@@ -19,8 +21,16 @@ public class Controller {
         datagram.socket = new MulticastSocket(datagram.port);
     }
     public void start() throws IOException, InterruptedException {
-        datagram.socket.joinGroup(datagram.addr); // через нетворк интерфейс сделать
+//        datagram.socket.joinGroup(datagram.addr); // через нетворк интерфейс сделать
 //        datagram.socket.setNetworkInterface(?); // через нетворк интерфейс сделать
+        InetAddress networkAddr = InetAddress.getByName("26.253.65.210");
+        NetworkInterface networkInterface = NetworkInterface.getByInetAddress(networkAddr);
+        datagram.socket.setNetworkInterface(networkInterface);
+//        if (networkInterface != null) {
+//        } else {
+//            System.err.println("Network interface not found.");
+//        }
+        datagram.socket.joinGroup(new InetSocketAddress(datagram.addr, datagram.port), networkInterface);
 
         Sender sender = new Sender();
         Listener listener = new Listener();
@@ -38,8 +48,10 @@ public class Controller {
         listenerThread.join();
         updaterThread.join();
 
-        datagram.socket.leaveGroup(datagram.addr);
+        datagram.socket.leaveGroup(new InetSocketAddress(datagram.addr, datagram.port), networkInterface);
         datagram.socket.close();
+//        datagram.socket.leaveGroup(datagram.addr);
+//        datagram.socket.close();
     }
 
     class Sender implements Runnable {
@@ -62,7 +74,6 @@ public class Controller {
             while(true) {
                 try {
                     Datagram recivedDatagram = MessageHandler.handleMessage(datagram);
-//                    System.out.println("111111111");
                     observer.updateLiveCopies(recivedDatagram);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -76,7 +87,6 @@ public class Controller {
         public void run() {
             while(true) {
                 observer.removeDeadCopies();
-//                observer.printLiveCopies();
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {

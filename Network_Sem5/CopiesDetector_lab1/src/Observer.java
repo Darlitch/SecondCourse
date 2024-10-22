@@ -12,12 +12,10 @@ public class Observer {
         liveCopies = new Hashtable<String, Long>();
     }
 
-    // ДОДЕЛАТЬ ФЛАГИ
+    // ДОДЕЛАТЬ ФЛАГИ синхронизации
     public void updateLiveCopies(Datagram datagram) throws UnsupportedEncodingException {
         int oldSize = liveCopies.size();
-        String msg = new String(datagram.msg, "UTF-8");
-        // СДЕЛАТЬ ЧЕРЕЗ ДЛИННУ СООБЩЕНИЯ
-        String key = datagram.addr.toString().substring(1) + ":" + Integer.toString(datagram.port) + " - " + msg.replaceAll("[^\\p{Print}]", "");
+        String key = datagram.addr.toString().substring(1) + ":" + Integer.toString(datagram.port) + " - " + new String(datagram.msg, "UTF-8");
         liveCopies.put(key, System.currentTimeMillis());
         if (liveCopies.size() > oldSize) {
             printLiveCopies();
@@ -40,7 +38,7 @@ public class Observer {
         }
     }
 
-    public void printLiveCopies() {
+    public synchronized void printLiveCopies() {
         if (liveCopies.isEmpty()) {
             System.out.println("No live copies");
             return;
