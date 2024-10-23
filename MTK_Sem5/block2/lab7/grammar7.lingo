@@ -1,0 +1,20 @@
+expr = sum | sub | mult | div | int | var | neg;
+
+sum = ws "(" ws expr:l ws "+" ws expr:r ws ")" { Sum(:l,:r) };
+mult = ws "(" ws expr:l ws "*" ws expr:r ws ")" { Mult(:l,:r) };
+sub = ws "(" ws expr:l ws "-" ws expr:r ws ")" { Sub(:l,:r) };
+div = ws "(" ws expr:l ws "/" ws expr:r ws ")" { Div(:l,:r) };
+
+// sum = ws expr:l ws "+" ws expr:r ws { Sum(:l,:r) };
+// mult = ws expr:l ws "*" ws expr:r ws { Mult(:l,:r) };
+// sub = ws expr:l ws "-" ws expr:r ws { Sub(:l,:r) };
+// div = ws expr:l ws "/" ws expr:r ws { Div(:l,:r) };
+
+neg = ws "-" ws expr:var ws { Neg(:var) };
+int = digit+$d{ Int(s2i($d)) };
+var = letter+$s{ Var($s) };
+
+
+digit = '0'-'9';
+letter = 'a'-'z';
+ws = " "*;

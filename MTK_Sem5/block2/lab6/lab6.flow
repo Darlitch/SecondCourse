@@ -1,22 +1,62 @@
 // Implement a calculator, which uses a reverse polish notation (RPN) expressions with int consts, + and *, and calculates its values. 
 // Write a translation functions from the arithmetic expressions to RPN and back.
-import grammar;
 import string;
+// import labs/block2/lab5/grammar;
 import labs/block2/lab5/lab5;
+import labs/block2/lab6/grammar6;
+
+export {
+    RPN2S(rpn : [ExprRPN]) -> string;
+    Ar2RPN(ar : Expr) -> [ExprRPN];
+    RPN2Ar(rpn : [ExprRPN]) -> Expr;
+    parseRPN(s : string) -> [ExprRPN];
+}
+
+RPN2S(rpn : [ExprRPN]) -> string {
+    fold(rpn, "", \acc, ex -> {
+        switch (ex) {
+            SumRPN() : acc + "+ ";
+            MultRPN() : acc + "* ";
+            IntRPN(i) : acc + i2s(i) + " ";
+        }
+    });
+}
 
 Ar2RPN(ar : Expr) -> [ExprRPN] {
     switch(ar) {
-        Mult(a, b) : concat(concat(Ar2RPN(a), Ar2RPN(b)), [MultRPN]);
-        Summ(a, b) : concat(concat(Ar2RPN(a), Ar2RPN(b)), [SummRPN]);
+        Mult(a, b) : concat(concat(Ar2RPN(a), Ar2RPN(b)), [MultRPN()]);
+        Sum(a, b) : concat(concat(Ar2RPN(a), Ar2RPN(b)), [SumRPN()]);
         IntConst(i) : [IntRPN(i)];
     }
 }
 
-RPN2Ar() -> Expr {
-
+RPN2Ar(rpn : [ExprRPN]) -> Expr {
+    list = fold(rpn, makeList(), \acc, ex -> {
+        switch (ex) {
+            SumRPN() : {
+                l = headList(acc, IntConst(0));
+                acc2 = tailList(acc);
+                r = headList(acc2, IntConst(0));
+                acc3 = tailList(acc2);
+                Cons(Sum(r,l), acc3);
+            }
+            MultRPN() : {
+                l = headList(acc, IntConst(0));
+                acc2 = tailList(acc);
+                r = headList(acc2, IntConst(0));
+                acc3 = tailList(acc);
+                Cons(Mult(r, l), acc3);
+            }
+            IntRPN(i) : {
+                Cons(IntConst(i), acc);
+            }
+        }
+    });
+    headList(list, IntConst(0));
 }
 
-main() {
-    var = " 2 4 + ";
-    
+parseRPN(s : string) -> [ExprRPN] {
+    grammar = compilePegGrammar("#include labs/block2/lab6/grammar6.lingo");
+    parsic(grammar, s, defaultPegActions);
 }
+

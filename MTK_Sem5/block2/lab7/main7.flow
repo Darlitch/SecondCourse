@@ -1,0 +1,10 @@
+import lab7;
+
+main() {
+    vars = setTreeValues(makeTree(), [Pair("x", ratNum(1, 2))]);
+    // ex = "((2+2) * 2)";
+    ex = "(1/( x -(2/4)))";
+    // parseRat(ex);
+    println(Ans2S(CalculateRat(parseRat(ex), vars)));
+    println(Expr2S(parseRat(ex)));
+}

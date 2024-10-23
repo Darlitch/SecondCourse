@@ -1,0 +1,7 @@
+expr = rule+;
+rule = sum | mult | int; 
+sum = ws "+" ws {SumRPN()};
+mult = ws "*" ws {MultRPN()};    
+int = ws digit+$d{ IntRPN(s2i($d)) };
+digit = '0'-'9';
+ws = " "*;

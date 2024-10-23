@@ -1,15 +1,17 @@
 import string;
 import lingo/pegcode/driver;
-import grammar;
+import labs/block2/lab5/grammar;
 
 export {
     Calculate(e : Expr) -> int;
+    Arr2Str(e : Expr) -> string;
+    s2Arr(s: string) -> Expr;
 }
 
 
 Calculate(e : Expr) -> int {
     switch(e) {
-        Add(l,r) : Calculate(l) + Calculate(r);
+        Sum(l,r) : Calculate(l) + Calculate(r);
         Mult(l,r) : Calculate(l) * Calculate(r);
         IntConst(i) : i;
     }
@@ -19,7 +21,7 @@ Arr2StrInside(e: Expr, flag : int) -> string {
     switch(e) {
         IntConst(i) : i2s(i);
         Mult(l, r) : Arr2StrInside(l, 1) + "*" + Arr2StrInside(r, 1);
-        Add(l, r) : {
+        Sum(l, r) : {
             expr = Arr2StrInside(l, 0) + "+" + Arr2StrInside(r,0);
             if (flag == 1) {
                 "(" + expr + ")";
@@ -30,18 +32,18 @@ Arr2StrInside(e: Expr, flag : int) -> string {
     }
 }
 
-Arr2Str(e: Expr) {
+Arr2Str(e: Expr) -> string {
     Arr2StrInside(e, 0);
 }
 
 s2Arr(s : string) -> Expr {
-    parsic(compilePegGrammar("#include grammar.lingo"), s, defaultPegActions);
+    parsic(compilePegGrammar("#include labs/block2/lab5/grammar.lingo"), s, defaultPegActions);
 }
 
 
 
-main() {
-    var = " (2 + 4) * 2 ";
-    println(Calculate(s2Arr(var)));
-    println(Arr2Str(s2Arr(var)));
-}
+// main() {
+//     var = " (2 + 4) * 2 ";
+//     println(Calculate(s2Arr(var)));
+//     println(Arr2Str(s2Arr(var)));
+// }

@@ -1,0 +1,110 @@
+import string;
+import lingo/pegcode/driver;
+import labs/block2/lab7/grammar7;
+
+export {
+    ratNum(num : int, denum : int);
+    Expr2S(ex : Expr) -> string;
+    Ans2S(ans : Maybe<ratNum>) -> string;
+    SumRat(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum>;
+    MultRat(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum>;
+    SubRat(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum>;
+    DivRat(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum>;
+    CalculateRat(ex : Expr, vars : Tree<string, ratNum>) -> Maybe<ratNum>;
+    parseRat(s : string) -> Expr;
+}
+
+SumRat(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratNum(0,1));
+        newR = either(r, ratNum(0,1));
+        nok = lcm(newL.denum, newR.denum);
+        newNum = nok * newL.num / newL.denum + nok * newR.num / newR.denum;
+        
+        nod = iabs(gcd(newNum, nok));
+        Some(ratNum(newNum / nod, nok / nod));
+    } else {
+        None();
+    }
+}
+    
+MultRat(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratNum(0,1));
+        newR = either(r, ratNum(0,1));
+        nok = lcm(newL.denum, newR.denum);
+        newNum = nok * newL.num / newL.denum * nok * newR.num / newR.denum;
+        
+        nod = iabs(gcd(newNum, nok));
+        Some(ratNum(newNum / nod, nok / nod));
+    } else {
+        None();
+    }
+}
+
+SubRat(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratNum(0,1));
+        newR = either(r, ratNum(0,1));
+        nok = lcm(newL.denum, newR.denum);
+        newNum = nok * newL.num / newL.denum - nok * newR.num / newR.denum;
+        
+        nod = iabs(gcd(newNum, nok));
+        Some(ratNum(newNum / nod, nok / nod));
+    } else {
+        None();
+    }
+}
+
+DivRat(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratNum(0,1));
+        newR = either(r, ratNum(0,1));
+        nok = lcm(newL.denum, newR.denum);
+        newNum = nok * newL.num / newL.denum / nok * newR.num / newR.denum;
+        
+        nod = iabs(gcd(newNum, nok));
+        Some(ratNum(newNum / nod, nok / nod));
+    } else {
+        None();
+    }
+}
+
+Expr2S(ex : Expr) -> string {
+    switch (ex) {
+        Sum(l,r): Expr2S(l) + "+" + Expr2S(r);  
+        Mult(l,r): Expr2S(l) + "*" + Expr2S(r);
+        Sub(l,r): Expr2S(l) + "-" + Expr2S(r);
+        Div(l,r): Expr2S(l) + "/" + Expr2S(r);  
+        Int(v): i2s(v);
+        Var(v): v;
+        Neg(v): "-" + Expr2S(v);
+    }
+}
+
+Ans2S(ans : Maybe<ratNum>) -> string {
+    if (isSome(ans)) {
+        val = either(ans, ratNum(0,1));
+        if(val.denum == 0) {"Error: Division by zero!";}
+        else if(val.denum == 1) {i2s(val.num);}
+        else {(i2s(val.num) + "/" + i2s(val.denum));}
+    } else {
+        "Error!";
+    }
+}
+
+CalculateRat(ex : Expr, vars : Tree<string, ratNum>) -> Maybe<ratNum> {
+    switch (ex : Expr) {
+        Sum(l, r): SumRat(CalculateRat(l, vars), CalculateRat(r, vars));
+        Mult(l, r): MultRat(CalculateRat(l, vars), CalculateRat(r, vars));
+        Sub(l, r): SubRat(CalculateRat(l, vars), CalculateRat(r, vars));
+        Div(l, r): DivRat(CalculateRat(l, vars), CalculateRat(r, vars));
+        Int(v): Some(ratNum(v, 1));
+        Var(v): lookupTree(vars, v);
+        Neg(v): MultRat(Some(ratNum(-1, 1)), CalculateRat(v, vars));
+    }
+}
+
+parseRat(s : string) -> Expr {
+    parsic(compilePegGrammar("#include labs/block2/lab7/grammar7.lingo"), s, defaultPegActions);
+}

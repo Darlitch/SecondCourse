@@ -1,0 +1,8 @@
+import lab6;
+
+main() {
+    var = "2 2 + 8 *";
+    println(Calculate(RPN2Ar(parseRPN(var))));
+    println(RPN2S(Ar2RPN(RPN2Ar(parseRPN(var)))));
+    //вроде осталось только протестить
+}
